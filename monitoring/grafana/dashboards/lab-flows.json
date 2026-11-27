@@ -1,0 +1,1589 @@
+{
+  "uid": "lab-flows",
+  "title": "Flux réseau (sFlow)",
+  "description": "Types de trafic qui traversent les routeurs : flux sFlow échantillonnés par SONiC, classés par protocole et application, par routeur ou par client / serveur.",
+  "tags": [
+    "sonic-lab",
+    "flux"
+  ],
+  "timezone": "browser",
+  "editable": true,
+  "graphTooltip": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m"
+    ]
+  },
+  "fiscalYearStartMonth": 0,
+  "liveNow": false,
+  "weekStart": "",
+  "schemaVersion": 41,
+  "version": 1,
+  "links": [
+    {
+      "type": "dashboards",
+      "tags": [
+        "sonic-lab"
+      ],
+      "asDropdown": true,
+      "title": "Tableaux du lab",
+      "includeVars": false,
+      "keepTime": true,
+      "icon": "external link",
+      "targetBlank": false,
+      "tooltip": "",
+      "url": ""
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "node",
+        "label": "Routeur",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-lab"
+        },
+        "query": "SHOW TAG VALUES FROM \"lab_node\" WITH KEY = \"node\" WHERE \"role\" = 'router' AND $timeFilter",
+        "definition": "SHOW TAG VALUES FROM \"lab_node\" WITH KEY = \"node\" WHERE \"role\" = 'router' AND $timeFilter",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "sort": 1,
+        "hide": 0,
+        "regex": "",
+        "options": [],
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        }
+      },
+      {
+        "name": "client",
+        "label": "Client / serveur",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-lab"
+        },
+        "query": "SHOW TAG VALUES FROM \"lab_node\" WITH KEY = \"node\" WHERE \"role\" = 'client' AND $timeFilter",
+        "definition": "SHOW TAG VALUES FROM \"lab_node\" WITH KEY = \"node\" WHERE \"role\" = 'client' AND $timeFilter",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "sort": 1,
+        "hide": 0,
+        "regex": "",
+        "options": [],
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        }
+      },
+      {
+        "name": "vue",
+        "label": "Trafic",
+        "type": "custom",
+        "description": "Entrée du réseau : ports des routeurs reliés à un client (chaque paquet compté une fois). Tous les ports : tout ce que reçoivent les routeurs choisis (un paquet compté sur chaque routeur traversé). Valeur : la valeur du tag edge exclue.",
+        "query": "Entrée du réseau : no,Tous les ports : tous",
+        "multi": false,
+        "includeAll": false,
+        "hide": 0,
+        "options": [
+          {
+            "text": "Entrée du réseau",
+            "value": "no",
+            "selected": true
+          },
+          {
+            "text": "Tous les ports",
+            "value": "tous",
+            "selected": false
+          }
+        ],
+        "current": {
+          "selected": true,
+          "text": "Entrée du réseau",
+          "value": "no"
+        }
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-lab"
+        },
+        "enable": true,
+        "hide": false,
+        "iconColor": "orange",
+        "name": "Tests de trafic et événements",
+        "query": "SELECT \"message\", \"node\", \"type\", \"program\" FROM \"lab_event\" WHERE $timeFilter AND (\"type\" = 'traffic' OR \"type\" = 'iperf' OR \"node\" =~ /^$node$/)",
+        "target": {
+          "query": "SELECT \"message\", \"node\", \"type\", \"program\" FROM \"lab_event\" WHERE $timeFilter AND (\"type\" = 'traffic' OR \"type\" = 'iperf' OR \"node\" =~ /^$node$/)",
+          "rawQuery": true,
+          "resultFormat": "table",
+          "refId": "Anno"
+        },
+        "textColumn": "message",
+        "tagsColumn": "node,type,program"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Débit (${vue:text})",
+      "description": "Débit moyen de la dernière minute, selon la liste « Trafic » : entré dans le réseau par les ports des routeurs reliés aux clients, ou reçu sur tous les ports des routeurs choisis. Estimation à partir des échantillons sFlow : chaque paquet échantillonné compte pour 256 paquets (taux d'échantillonnage des routeurs, minimum du modèle YANG de SONiC).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"bytes\") * 8 / 60 FROM \"lab_flow\" WHERE \"edge\" != '$vue' AND \"node\" =~ /^$node$/ AND (\"src_node\" =~ /^$client$/ OR \"dst_node\" =~ /^$client$/) AND time > now() - 1m",
+          "rawQuery": true,
+          "resultFormat": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "aucune donnée depuis 1 min"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 4,
+        "h": 3
+      },
+      "id": 1
+    },
+    {
+      "type": "stat",
+      "title": "Applications vues (15 min)",
+      "description": "Nombre d'applications (port bien connu du serveur, ou protocole) dans le trafic des 15 dernières minutes, selon la liste « Trafic ».",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT count(\"b\") FROM (SELECT sum(\"bytes\") AS \"b\" FROM \"lab_flow\" WHERE \"edge\" != '$vue' AND \"node\" =~ /^$node$/ AND (\"src_node\" =~ /^$client$/ OR \"dst_node\" =~ /^$client$/) AND time > now() - 15m GROUP BY \"app\")",
+          "rawQuery": true,
+          "resultFormat": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 4,
+        "y": 0,
+        "w": 4,
+        "h": 3
+      },
+      "id": 2
+    },
+    {
+      "type": "stat",
+      "title": "Échantillons reçus",
+      "description": "Paquets échantillonnés reçus par seconde (dernière minute), tous ports confondus.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"samples\") / 60 FROM \"lab_flow\" WHERE \"node\" =~ /^$node$/ AND (\"src_node\" =~ /^$client$/ OR \"dst_node\" =~ /^$client$/) AND time > now() - 1m",
+          "rawQuery": true,
+          "resultFormat": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:/s",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "aucune donnée depuis 1 min",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 4,
+        "h": 3
+      },
+      "id": 3
+    },
+    {
+      "type": "stat",
+      "title": "Routeurs qui émettent",
+      "description": "Routeurs dont des datagrammes sFlow sont arrivés dans la dernière minute (hsflowd envoie aussi des compteurs toutes les 20 s, même sans trafic).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT count(\"d\") FROM (SELECT sum(\"datagrams\") AS \"d\" FROM \"lab_flow_agent\" WHERE time > now() - 1m GROUP BY \"node\")",
+          "rawQuery": true,
+          "resultFormat": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "aucun : sFlow déployé ?"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 4,
+        "h": 3
+      },
+      "id": 4
+    },
+    {
+      "type": "stat",
+      "title": "Échantillonnage",
+      "description": "Taux d'échantillonnage observé : un paquet sur N (paquets estimés / échantillons, 15 dernières minutes).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"packets\") / sum(\"samples\") FROM \"lab_flow\" WHERE time > now() - 15m",
+          "rawQuery": true,
+          "resultFormat": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "prefix:1 / ",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "aucun flux",
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 4,
+        "h": 3
+      },
+      "id": 5
+    },
+    {
+      "type": "stat",
+      "title": "Collecteur sFlow",
+      "description": "Écoute UDP du collecteur (Telegraf, FLOW_COLLECTOR_IP:6343) au dernier cycle.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"listening\") FROM \"lab_collector\" WHERE \"task\" = 'flows' AND time > now() - 1m",
+          "rawQuery": true,
+          "resultFormat": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "arrêté",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "en écoute",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "noValue": "pas de cycle"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 20,
+        "y": 0,
+        "w": 4,
+        "h": 3
+      },
+      "id": 6
+    },
+    {
+      "type": "text",
+      "title": "",
+      "options": {
+        "mode": "markdown",
+        "content": "**Lecture** : les routeurs SONiC échantillonnent 1 paquet sur 256 (sFlow) et l'envoient au collecteur, qui le classe par protocole et par application d'après le port bien connu du serveur (http 80, dns 53, iperf3 5201…). Il faut donc du volume pour voir un type de trafic : `make traffic TYPE=mix DURATION=60`, ou les commandes du GUIDE (§ 10.8) dans le terminal des clients. **Trafic** : « Entrée du réseau » ne compte que les ports reliés à un client (un spine ou un routeur IPN n'en a pas) ; « Tous les ports » montre tout ce que reçoivent les routeurs choisis. **Client / serveur** : le trafic émis ou reçu par ce nœud (adresse source ou destination, aussi à l'intérieur des tunnels VXLAN), sur tous les routeurs qu'il traverse. La conf sFlow des routeurs vient de leur conf de démarrage (ou de la CD Ansible du projet `network-config`)."
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 24,
+        "h": 2
+      },
+      "id": 7,
+      "transparent": true
+    },
+    {
+      "type": "row",
+      "title": "Trafic par application : ${vue:text}",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 24,
+        "h": 1
+      },
+      "id": 8
+    },
+    {
+      "type": "timeseries",
+      "title": "Débit par application",
+      "description": "Liste « Trafic » : « Entrée du réseau » garde ce que les routeurs reçoivent sur leurs ports reliés à un client (trafic qui entre dans le réseau, compté une seule fois même s'il traverse plusieurs routeurs) ; un routeur sans port vers un client (spine, IPN) n'y voit rien. « Tous les ports » garde tout ce que reçoivent les routeurs choisis : un flux qui traverse plusieurs routeurs y est compté sur chacun. Estimation à partir des échantillons sFlow : chaque paquet échantillonné compte pour 256 paquets (taux d'échantillonnage des routeurs, minimum du modèle YANG de SONiC).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"bytes\") * 8000 / $__interval_ms FROM \"lab_flow\" WHERE \"edge\" != '$vue' AND \"node\" =~ /^$node$/ AND (\"src_node\" =~ /^$client$/ OR \"dst_node\" =~ /^$client$/) AND $timeFilter GROUP BY time($__interval), \"app\" fill(0)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_app"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 35,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucun flux sur la période (routeur sans port vers un client ? liste « Trafic » › Tous les ports)"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "sortBy": "Mean",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": true
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 12,
+        "h": 9
+      },
+      "id": 9,
+      "interval": "20s"
+    },
+    {
+      "type": "timeseries",
+      "title": "Débit par protocole",
+      "description": "Liste « Trafic » : « Entrée du réseau » garde ce que les routeurs reçoivent sur leurs ports reliés à un client (trafic qui entre dans le réseau, compté une seule fois même s'il traverse plusieurs routeurs) ; un routeur sans port vers un client (spine, IPN) n'y voit rien. « Tous les ports » garde tout ce que reçoivent les routeurs choisis : un flux qui traverse plusieurs routeurs y est compté sur chacun. Estimation à partir des échantillons sFlow : chaque paquet échantillonné compte pour 256 paquets (taux d'échantillonnage des routeurs, minimum du modèle YANG de SONiC).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"bytes\") * 8000 / $__interval_ms FROM \"lab_flow\" WHERE \"edge\" != '$vue' AND \"node\" =~ /^$node$/ AND (\"src_node\" =~ /^$client$/ OR \"dst_node\" =~ /^$client$/) AND $timeFilter GROUP BY time($__interval), \"proto\" fill(0)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_proto"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 35,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucun flux sur la période (routeur sans port vers un client ? liste « Trafic » › Tous les ports)"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "sortBy": "Mean",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": true
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 6,
+        "w": 12,
+        "h": 9
+      },
+      "id": 10,
+      "interval": "20s"
+    },
+    {
+      "type": "piechart",
+      "title": "Répartition par application",
+      "description": "Volume estimé sur la période, par application. Liste « Trafic » : « Entrée du réseau » garde ce que les routeurs reçoivent sur leurs ports reliés à un client (trafic qui entre dans le réseau, compté une seule fois même s'il traverse plusieurs routeurs) ; un routeur sans port vers un client (spine, IPN) n'y voit rien. « Tous les ports » garde tout ce que reçoivent les routeurs choisis : un flux qui traverse plusieurs routeurs y est compté sur chacun. Estimation à partir des échantillons sFlow : chaque paquet échantillonné compte pour 256 paquets (taux d'échantillonnage des routeurs, minimum du modèle YANG de SONiC).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"bytes\") FROM \"lab_flow\" WHERE \"edge\" != '$vue' AND \"node\" =~ /^$node$/ AND (\"src_node\" =~ /^$client$/ OR \"dst_node\" =~ /^$client$/) AND $timeFilter GROUP BY \"app\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_app"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decbytes",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "noValue": "aucun flux sur la période (routeur sans port vers un client ? liste « Trafic » › Tous les ports)"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "pieType": "donut",
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 15,
+        "w": 8,
+        "h": 9
+      },
+      "id": 11
+    },
+    {
+      "type": "table",
+      "title": "Conversations",
+      "description": "Qui parle à qui, avec quel protocole et quelle application, sur la période (volumes estimés). Liste « Trafic » : « Entrée du réseau » garde ce que les routeurs reçoivent sur leurs ports reliés à un client (trafic qui entre dans le réseau, compté une seule fois même s'il traverse plusieurs routeurs) ; un routeur sans port vers un client (spine, IPN) n'y voit rien. « Tous les ports » garde tout ce que reçoivent les routeurs choisis : un flux qui traverse plusieurs routeurs y est compté sur chacun. Estimation à partir des échantillons sFlow : chaque paquet échantillonné compte pour 256 paquets (taux d'échantillonnage des routeurs, minimum du modèle YANG de SONiC).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"bytes\") AS \"octets\", sum(\"packets\") AS \"paquets\", sum(\"samples\") AS \"echantillons\" FROM \"lab_flow\" WHERE \"edge\" != '$vue' AND \"node\" =~ /^$node$/ AND (\"src_node\" =~ /^$client$/ OR \"dst_node\" =~ /^$client$/) AND $timeFilter GROUP BY \"src_node\", \"src\", \"dst_node\", \"dst\", \"proto\", \"app\"",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "src_node": 0,
+              "src": 1,
+              "dst_node": 2,
+              "dst": 3,
+              "proto": 4,
+              "app": 5,
+              "octets": 6,
+              "paquets": 7,
+              "echantillons": 8
+            },
+            "renameByName": {
+              "src_node": "Source",
+              "src": "Adresse source",
+              "dst_node": "Destination",
+              "dst": "Adresse destination",
+              "proto": "Protocole",
+              "app": "Application",
+              "octets": "Volume estimé",
+              "paquets": "Paquets estimés",
+              "echantillons": "Échantillons"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucun flux sur la période (routeur sans port vers un client ? liste « Trafic » › Tous les ports)"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Volume estimé"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "decbytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Paquets estimés"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "Volume estimé",
+            "desc": true
+          }
+        ]
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 15,
+        "w": 16,
+        "h": 9
+      },
+      "id": 12
+    },
+    {
+      "type": "row",
+      "title": "Par routeur et par port (chaque routeur traversé compte)",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 24,
+        "h": 1
+      },
+      "id": 13
+    },
+    {
+      "type": "timeseries",
+      "title": "Débit échantillonné par port",
+      "description": "Trafic reçu sur chaque port des routeurs sélectionnés (échantillonnage en entrée), avec le nœud relié au port. Un flux qui traverse deux routeurs apparaît sur les deux. Estimation à partir des échantillons sFlow : chaque paquet échantillonné compte pour 256 paquets (taux d'échantillonnage des routeurs, minimum du modèle YANG de SONiC).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"bytes\") * 8000 / $__interval_ms FROM \"lab_flow\" WHERE \"node\" =~ /^$node$/ AND (\"src_node\" =~ /^$client$/ OR \"dst_node\" =~ /^$client$/) AND $timeFilter GROUP BY time($__interval), \"node\", \"interface\", \"peer_node\" fill(0)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_node $tag_interface ← $tag_peer_node"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucun flux sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "sortBy": "Mean",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": true
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 25,
+        "w": 12,
+        "h": 8
+      },
+      "id": 14,
+      "interval": "20s"
+    },
+    {
+      "type": "table",
+      "title": "Applications par port",
+      "description": "Volume estimé sur la période, par port d'entrée et par application. « Entrée » : port relié à un client. Estimation à partir des échantillons sFlow : chaque paquet échantillonné compte pour 256 paquets (taux d'échantillonnage des routeurs, minimum du modèle YANG de SONiC).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"bytes\") AS \"octets\", sum(\"samples\") AS \"echantillons\" FROM \"lab_flow\" WHERE \"node\" =~ /^$node$/ AND (\"src_node\" =~ /^$client$/ OR \"dst_node\" =~ /^$client$/) AND $timeFilter GROUP BY \"node\", \"interface\", \"peer_node\", \"edge\", \"proto\", \"app\"",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "node": 0,
+              "interface": 1,
+              "peer_node": 2,
+              "edge": 3,
+              "proto": 4,
+              "app": 5,
+              "octets": 6,
+              "echantillons": 7
+            },
+            "renameByName": {
+              "node": "Routeur",
+              "interface": "Port",
+              "peer_node": "Relié à",
+              "edge": "Entrée",
+              "proto": "Protocole",
+              "app": "Application",
+              "octets": "Volume estimé",
+              "echantillons": "Échantillons"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucun flux sur la période"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Volume estimé"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "decbytes"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "Volume estimé",
+            "desc": true
+          }
+        ]
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 25,
+        "w": 12,
+        "h": 8
+      },
+      "id": 15
+    },
+    {
+      "type": "row",
+      "title": "Overlay VXLAN",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 33,
+        "w": 24,
+        "h": 1
+      },
+      "id": 16
+    },
+    {
+      "type": "timeseries",
+      "title": "Trafic VXLAN par VNI",
+      "description": "Trafic encapsulé en VXLAN (UDP 4789) vu par les routeurs, par VNI : le collecteur décode le paquet interne. Vide dans le lab de base, sans VXLAN. Estimation à partir des échantillons sFlow : chaque paquet échantillonné compte pour 256 paquets (taux d'échantillonnage des routeurs, minimum du modèle YANG de SONiC).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"bytes\") * 8000 / $__interval_ms FROM \"lab_flow\" WHERE \"encap\" = 'vxlan' AND \"node\" =~ /^$node$/ AND (\"src_node\" =~ /^$client$/ OR \"dst_node\" =~ /^$client$/) AND $timeFilter GROUP BY time($__interval), \"vni\" fill(0)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "VNI $tag_vni"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 35,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucun flux sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "sortBy": "Mean",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": true
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 34,
+        "w": 12,
+        "h": 7
+      },
+      "id": 17,
+      "interval": "20s"
+    },
+    {
+      "type": "table",
+      "title": "VXLAN : applications par VNI",
+      "description": "Applications du trafic interne des tunnels VXLAN, sur la période. Estimation à partir des échantillons sFlow : chaque paquet échantillonné compte pour 256 paquets (taux d'échantillonnage des routeurs, minimum du modèle YANG de SONiC).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"bytes\") AS \"octets\" FROM \"lab_flow\" WHERE \"encap\" = 'vxlan' AND \"node\" =~ /^$node$/ AND (\"src_node\" =~ /^$client$/ OR \"dst_node\" =~ /^$client$/) AND $timeFilter GROUP BY \"node\", \"vni\", \"src\", \"dst\", \"app\"",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "node": 0,
+              "vni": 1,
+              "src": 2,
+              "dst": 3,
+              "app": 4,
+              "octets": 5
+            },
+            "renameByName": {
+              "node": "Routeur",
+              "vni": "VNI",
+              "src": "Source",
+              "dst": "Destination",
+              "app": "Application",
+              "octets": "Volume estimé"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucun flux sur la période"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Volume estimé"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "decbytes"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "Volume estimé",
+            "desc": true
+          }
+        ]
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 34,
+        "w": 12,
+        "h": 7
+      },
+      "id": 18
+    },
+    {
+      "type": "row",
+      "title": "Collecte sFlow",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 41,
+        "w": 24,
+        "h": 1
+      },
+      "id": 19
+    },
+    {
+      "type": "timeseries",
+      "title": "Datagrammes et échantillons reçus",
+      "description": "Par routeur : datagrammes sFlow reçus et échantillons de paquets qu'ils contiennent (par seconde).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"datagrams\") * 1000 / $__interval_ms AS \"datagrammes\", sum(\"flow_samples\") * 1000 / $__interval_ms AS \"echantillons\" FROM \"lab_flow_agent\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval), \"node\" fill(0)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_node $col"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix:/s",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucun flux sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "sortBy": "Mean",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": true
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 42,
+        "w": 12,
+        "h": 7
+      },
+      "id": 20,
+      "interval": "20s"
+    },
+    {
+      "type": "timeseries",
+      "title": "Pertes, erreurs et sources rejetées",
+      "description": "Datagrammes perdus (trous dans la séquence de l'agent), illisibles, et datagrammes rejetés parce qu'ils ne viennent pas de l'IP de management d'un routeur du lab.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"lost\") AS \"perdus\", sum(\"errors\") AS \"illisibles\" FROM \"lab_flow_agent\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval), \"node\" fill(0)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_node $col"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"rejected\") AS \"rejetés\" FROM \"lab_collector\" WHERE \"task\" = 'flows' AND $timeFilter GROUP BY time($__interval) fill(0)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "sources inconnues (rejetés)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucun flux sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "sortBy": "Mean",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": true
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 42,
+        "w": 12,
+        "h": 7
+      },
+      "id": 21,
+      "interval": "20s"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+# Tests du serveur RESTCONF (make test) ; dans le routeur, seules la bibliothèque standard et les
+# bibliothèques de l'image SONiC (sonic_yang, libyang, generic_config_updater) sont utilisées.
+pytest==9.2.0
+pyang==2.7.1

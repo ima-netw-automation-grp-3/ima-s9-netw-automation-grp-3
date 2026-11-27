@@ -1,0 +1,86 @@
+# Lab SONiC : 2 routeurs SONiC-VS (image docker-sonic-vs fournie) + 2 clients Alpine.
+# Déployé par le service compose « clab » (voir ../docker-compose.yml et clab-runner.sh).
+#
+#  client1 ─eth1──eth1/Ethernet0─ sonic1 ─Ethernet4/eth2────eth2/Ethernet4─ sonic2 ─Ethernet0/eth1──eth1─ client2
+#  .10        192.168.1.0/24        .1    10.0.12.1/30      10.0.12.2/30      .1     192.168.2.0/24       .10
+#
+#  sonic1 : AS 65001, Loopback0 10.255.0.1/32   sonic2 : AS 65002, Loopback0 10.255.0.2/32 (eBGP)
+#
+# Côté SONiC, ethN correspond au port Ethernet{4*(N-1)} (HWSKU Force10-S6000) : eth1 = Ethernet0, eth2 = Ethernet4.
+name: sonic-lab
+
+# Réseau créé par docker compose (réseau « mgmt » de ../docker-compose.yml, même nom et même
+# sous-réseau) : containerlab le réutilise et ne le supprime pas au destroy. GitLab y a l'IP
+# 172.20.30.5 (GITLAB_IP) : ne la donnez pas à un nœud. Pas de plage (ipv4-range ici, ip_range dans
+# compose) : containerlab refuse toute IP fixe de nœud située hors de la plage du réseau.
+mgmt:
+  network: sonic-lab-mgmt
+  ipv4-subnet: 172.20.30.0/24
+
+topology:
+  kinds:
+    sonic-vs:
+      image: docker-sonic-vs:latest
+      env:
+        # Requis : le supervisord.conf de l'image référence %(ENV_BGPD_GRACEFUL_RESTART_ARG)s,
+        # supervisord refuse de démarrer si la variable n'existe pas.
+        BGPD_GRACEFUL_RESTART_ARG: ""
+        # Identifiants du serveur RESTCONF (HTTP Basic), depuis le .env via le service compose « clab ».
+        RESTCONF_USER: ${RESTCONF_USER:=admin}
+        RESTCONF_PASSWORD: ${RESTCONF_PASSWORD:=YourPaSsWoRd}
+      sysctls:
+        net.ipv4.ip_forward: 1
+        net.ipv6.conf.all.forwarding: 1
+      binds:
+        - sonic/lab-bootstrap.sh:/usr/local/bin/lab-bootstrap.sh:ro
+        # Serveur RESTCONF (lancé par le bootstrap, sous supervisord) et les deux modules purs de
+        # l'interface web qu'il réutilise (replace FRR, analyse de ping).
+        - sonic/restconf:/usr/local/lib/sonic-lab/restconf:ro
+        - ../web/backend/app/frr_config.py:/usr/local/lib/sonic-lab/frr_config.py:ro
+        - ../web/backend/app/parsers.py:/usr/local/lib/sonic-lab/parsers.py:ro
+      exec:
+        # Attend que SONiC soit prêt, applique la conf FRR de démarrage, lance le serveur RESTCONF.
+        - bash /usr/local/bin/lab-bootstrap.sh
+    linux:
+      image: alpine:3.22
+
+  nodes:
+    sonic1:
+      kind: sonic-vs
+      mgmt-ipv4: 172.20.30.11
+      binds:
+        # start.sh de l'image copie /var/sonic/config_db.json vers /etc/sonic/config_db.json au boot.
+        - configs/sonic1/config_db.json:/var/sonic/config_db.json:ro
+        - configs/sonic1/frr.conf:/etc/sonic/lab/frr.conf:ro
+    sonic2:
+      kind: sonic-vs
+      mgmt-ipv4: 172.20.30.12
+      binds:
+        - configs/sonic2/config_db.json:/var/sonic/config_db.json:ro
+        - configs/sonic2/frr.conf:/etc/sonic/lab/frr.conf:ro
+
+    client1:
+      kind: linux
+      mgmt-ipv4: 172.20.30.21
+      exec:
+        # MTU alignée sur les ports SONiC (9100) : avec la valeur par défaut des liens containerlab
+        # (9500), les gros segments TCP seraient perdus à l'entrée du routeur.
+        - ip link set eth1 mtu 9100
+        - ip link set eth1 up
+        - ip addr add 192.168.1.10/24 dev eth1
+        - ip route add 10.0.0.0/8 via 192.168.1.1
+        - ip route add 192.168.0.0/16 via 192.168.1.1
+    client2:
+      kind: linux
+      mgmt-ipv4: 172.20.30.22
+      exec:
+        - ip link set eth1 mtu 9100
+        - ip link set eth1 up
+        - ip addr add 192.168.2.10/24 dev eth1
+        - ip route add 10.0.0.0/8 via 192.168.2.1
+        - ip route add 192.168.0.0/16 via 192.168.2.1
+
+  links:
+    - endpoints: ["client1:eth1", "sonic1:eth1"]
+    - endpoints: ["sonic1:eth2", "sonic2:eth2"]
+    - endpoints: ["sonic2:eth1", "client2:eth1"]

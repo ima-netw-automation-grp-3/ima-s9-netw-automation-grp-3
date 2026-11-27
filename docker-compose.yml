@@ -1,0 +1,386 @@
+# Lab SONiC (containerlab) + interface web de gestion + métrologie (Telegraf, InfluxDB, Grafana)
+# + GitLab de l'équipe et son runner (CI/CD par RESTCONF), sur le réseau de management du lab.
+#
+# À lancer depuis la racine du projet (containerlab doit voir les fichiers du lab au même chemin
+# que sur l'hôte, d'où le montage ${PWD}:${PWD}) :
+#   make up      (équivaut à : docker compose up -d --build)
+#   make down    (détruit le lab puis arrête l'interface, la métrologie et GitLab ; les données sont gardées)
+name: sonic-lab
+
+networks:
+  # Réseau de management du lab (eth0 des nœuds). Créé par compose plutôt que par containerlab pour
+  # que GitLab (GITLAB_IP, .5) et le collecteur sFlow de Telegraf (FLOW_COLLECTOR_IP, .6) y aient une
+  # IP fixe : containerlab réutilise un réseau existant, et ne supprime au destroy que les réseaux
+  # portant son label. Nom et sous-réseau identiques au bloc « mgmt » de lab/sonic-lab.clab.yml. Pas
+  # d'ip_range : containerlab refuse alors les IP fixes des nœuds situées hors de la plage. Les
+  # conteneurs des jobs du runner GitLab y prennent donc une IP libre quelconque.
+  mgmt:
+    name: sonic-lab-mgmt
+    ipam:
+      config:
+        - subnet: 172.20.30.0/24
+          gateway: 172.20.30.1
+
+services:
+  # Exécute containerlab dans un conteneur : charge l'image SONiC si besoin, déploie le lab,
+  # le détruit à l'arrêt du service. Lance aussi l'agent GitOps (lab/gitops/) : le projet GitLab de
+  # l'infra (topologie + confs de démarrage) pilote le lab, par merge request.
+  clab:
+    build:
+      context: ./lab/clab
+    image: sonic-lab-clab:0.83.0
+    privileged: true
+    network_mode: host
+    pid: host
+    working_dir: ${PWD:?lancez docker compose depuis la racine du projet}/lab
+    entrypoint: ["bash", "${PWD}/lab/clab-runner.sh"]
+    environment:
+      # Identifiants du serveur RESTCONF des routeurs (repris par lab/sonic-lab.clab.yml).
+      RESTCONF_USER: ${RESTCONF_USER:-admin}
+      RESTCONF_PASSWORD: ${RESTCONF_PASSWORD:?à définir dans .env (make init)}
+      # Agent GitOps : GitLab joint par l'IP du réseau de management (ce service est sur le réseau de
+      # l'hôte), l'interface web par 127.0.0.1 (restauration des confs de démarrage).
+      LAB_NAME: sonic-lab
+      GITOPS_ENABLED: ${GITOPS_ENABLED:-1}
+      GITOPS_PROJECT: ${GITOPS_PROJECT:-}
+      GITOPS_INTERVAL: ${GITOPS_INTERVAL:-20}
+      GITOPS_ALLOWED_IMAGES: ${GITOPS_ALLOWED_IMAGES:-docker-sonic-vs:latest,alpine:3.22}
+      GITLAB_IP: ${GITLAB_IP:-172.20.30.5}
+      # IP réservée au collecteur sFlow (Telegraf) : refusée aux nœuds par le validateur GitOps
+      FLOW_COLLECTOR_IP: ${FLOW_COLLECTOR_IP:-172.20.30.6}
+      GITLAB_GROUP: ${GITLAB_GROUP:-ima-netw-automation-grp-3}
+      GITLAB_API_TOKEN: ${GITLAB_API_TOKEN:?à définir dans .env (make init)}
+      WEB_BIND: ${WEB_BIND:-127.0.0.1}
+      WEB_PORT: ${WEB_PORT:-8080}
+      WEB_AUTH_USER: ${WEB_AUTH_USER:-}
+      WEB_AUTH_PASSWORD: ${WEB_AUTH_PASSWORD:-}
+      # Empreinte de docker-sonic-vs.gz vérifiée avant « docker load » (GUIDE.md, « Image SONiC ») ;
+      # SONIC_ARCHIVE_SHA256= (vide) dans .env : pas de vérification
+      SONIC_ARCHIVE_SHA256: ${SONIC_ARCHIVE_SHA256-e3416916c2985f98cccef9faefc9cdecb62a5b2bc5f7abe758f6420cf0d6d1b7}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/netns:/var/run/netns
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ${PWD}:${PWD}
+    healthcheck:
+      test: ["CMD", "grep", "-qx", "deployed", "${PWD}/lab/.runner-status"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10m
+    # Laisse le temps à « containerlab destroy » de se terminer à l'arrêt (make stop/down, bouton
+    # « Arrêter le lab » de l'interface : même délai, RUNNER_STOP_TIMEOUT de web/backend/app/lab.py).
+    stop_grace_period: 3m
+    restart: unless-stopped
+
+  # Interface web (FastAPI + React) : pilote les nœuds via la socket Docker (docker exec).
+  web:
+    build:
+      context: ./web
+    image: sonic-lab-web:latest
+    depends_on:
+      clab:
+        condition: service_started
+    ports:
+      # Publiée sur 127.0.0.1 par défaut : l'interface a un accès root à Docker. Exposée ailleurs
+      # (WEB_BIND), elle refuse de démarrer sans WEB_AUTH_USER / WEB_AUTH_PASSWORD.
+      - "${WEB_BIND:-127.0.0.1}:${WEB_PORT:-8080}:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./lab:/lab
+      # pcap des captures de paquets (écrits par les sondes dumpcap, voir web/backend/app/captures.py)
+      - captures:/captures
+    environment:
+      LAB_NAME: sonic-lab
+      LAB_DIR: /lab
+      TOPOLOGY_FILE: sonic-lab.clab.yml
+      COMPOSE_PROJECT: sonic-lab
+      RUNNER_SERVICE: clab
+      WEB_AUTH_USER: ${WEB_AUTH_USER:-}
+      WEB_AUTH_PASSWORD: ${WEB_AUTH_PASSWORD:-}
+      # Adresse de publication (ci-dessus), pour refuser de démarrer exposée sans authentification
+      WEB_BIND: ${WEB_BIND:-127.0.0.1}
+      # Noms d'hôte acceptés (anti DNS rebinding) ; vide = localhost, 127.0.0.1, [::1]
+      WEB_ALLOWED_HOSTS: ${WEB_ALLOWED_HOSTS:-}
+      # Onglet « Métrologie » : Grafana vu par le navigateur (vide = http://<hôte de l'interface>:port)
+      GRAFANA_URL: ${GRAFANA_URL:-}
+      GRAFANA_PORT: ${GRAFANA_PORT:-3000}
+      GRAFANA_INTERNAL_URL: http://grafana:3000
+      # Mode GitOps : « Sauvegarder running → startup » ouvre une merge request dans le projet de l'infra
+      GITLAB_URL: http://gitlab
+      GITLAB_API_TOKEN: ${GITLAB_API_TOKEN:?à définir dans .env (make init)}
+      GITLAB_GROUP: ${GITLAB_GROUP:-ima-netw-automation-grp-3}
+      GITOPS_PROJECT: ${GITOPS_PROJECT:-}
+      # Captures de paquets (onglet « Capture ») : image Wireshark et volume des pcap (nom du volume
+      # `captures` de ce fichier, préfixé par le projet compose)
+      CAPTURE_IMAGE: ${CAPTURE_IMAGE:-lscr.io/linuxserver/wireshark:4.6.9}
+      CAPTURE_VOLUME: sonic-lab_captures
+      CAPTURE_MAX_SESSIONS: ${CAPTURE_MAX_SESSIONS:-3}
+      CAPTURE_MAX_MB: ${CAPTURE_MAX_MB:-500}
+    restart: unless-stopped
+
+  # Sert seulement à télécharger l'image Wireshark à l'avance (`make up`) : les captures la lancent à la
+  # demande. Profil « tools » : jamais démarré par `docker compose up`.
+  wireshark-image:
+    image: ${CAPTURE_IMAGE:-lscr.io/linuxserver/wireshark:4.6.9}
+    profiles: [tools]
+    entrypoint: ["true"]
+
+  # --- Métrologie : stack TIG ------------------------------------------------------------------
+  # Base de séries temporelles. Les variables DOCKER_INFLUXDB_INIT_* ne servent qu'au premier
+  # démarrage (volume vide) : pour en changer ensuite, supprimez le volume influxdb-data.
+  influxdb:
+    image: influxdb:2.10.1-alpine
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_ADMIN_USER:-admin}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD:?à définir dans .env (make init)}
+      DOCKER_INFLUXDB_INIT_ORG: sonic-lab
+      DOCKER_INFLUXDB_INIT_BUCKET: lab
+      DOCKER_INFLUXDB_INIT_RETENTION: ${INFLUXDB_RETENTION:-7d}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN:?à définir dans .env (make init)}
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+      - influxdb-config:/etc/influxdb2
+      - ./monitoring/influxdb/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      # Interface d'InfluxDB (Data Explorer) et API, sur 127.0.0.1 par défaut.
+      - "${INFLUXDB_BIND:-127.0.0.1}:${INFLUXDB_PORT:-8086}:8086"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8086/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Collecte : découverte des nœuds du lab, docker exec dans chacun, sondes, conteneurs, hôte, et
+  # flux sFlow des routeurs. Sur le réseau de management à l'IP FLOW_COLLECTOR_IP, où hsflowd envoie
+  # ses datagrammes (UDP 6343). Seul ce port y écoute, et seuls les datagrammes venant de l'IP de
+  # management d'un routeur sont décodés (les jobs CI partagent ce réseau) ; l'écoute du listener
+  # InfluxDB reste sur 127.0.0.1.
+  telegraf:
+    build:
+      context: ./monitoring/telegraf
+    image: sonic-lab-telegraf:latest
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    networks:
+      default:
+      mgmt:
+        ipv4_address: ${FLOW_COLLECTOR_IP:-172.20.30.6}
+    volumes:
+      # Accès root à Docker : découverte des nœuds, docker exec, statistiques des conteneurs.
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./lab:/lab:ro
+      # Système de fichiers de l'hôte, en lecture seule, pour les métriques de l'hôte.
+      - /:/hostfs:ro
+    environment:
+      LAB_NAME: sonic-lab
+      LAB_DIR: /lab
+      TOPOLOGY_FILE: sonic-lab.clab.yml
+      COMPOSE_PROJECT: sonic-lab
+      SONIC_KINDS: sonic-vs
+      TELEGRAF_INTERVAL: ${TELEGRAF_INTERVAL:-10s}
+      PROBE_SCOPE: ${PROBE_SCOPE:-all}
+      PROBE_COUNT: ${PROBE_COUNT:-5}
+      PROBE_INTERVAL: ${PROBE_INTERVAL:-0.2}
+      PROBE_MAX_TARGETS: ${PROBE_MAX_TARGETS:-64}
+      # Flux sFlow : écoute UDP sur l'IP du réseau de management (0 = pas de collecte de flux)
+      SFLOW_PORT: ${SFLOW_PORT:-6343}
+      SFLOW_BIND: ${FLOW_COLLECTOR_IP:-172.20.30.6}
+      FLOW_MAX_KEYS: ${FLOW_MAX_KEYS:-2000}
+      INFLUX_URL: http://influxdb:8086
+      INFLUX_TOKEN: ${INFLUXDB_TOKEN:?à définir dans .env (make init)}
+      INFLUX_ORG: sonic-lab
+      INFLUX_BUCKET: lab
+      HOST_PROC: /hostfs/proc
+      HOST_SYS: /hostfs/sys
+      HOST_ETC: /hostfs/etc
+      HOST_VAR: /hostfs/var
+      HOST_RUN: /hostfs/run
+      HOST_MOUNT_PREFIX: /hostfs
+    restart: unless-stopped
+
+  # Tableaux de bord (dossier du nom du lab), lecture anonyme, intégrables dans l'interface web.
+  grafana:
+    image: grafana/grafana:13.3.1
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    environment:
+      # Nom du dossier des tableaux de bord (provisioning/dashboards/sonic-lab.yml) : le nom du lab
+      LAB_NAME: sonic-lab
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?à définir dans .env (make init)}
+      # Consultation sans compte (rôle Viewer) : nécessaire à l'onglet « Métrologie » de l'interface.
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      # URL publique (reverse proxy) : liens, partages et redirections de Grafana
+      GF_SERVER_ROOT_URL: ${GRAFANA_URL:-http://localhost:3000}
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/dashboards/lab-overview.json
+      GF_USERS_DEFAULT_LANGUAGE: fr-FR
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
+      GF_NEWS_NEWS_FEED_ENABLED: "false"
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:?à définir dans .env (make init)}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/etc/grafana/dashboards:ro
+    ports:
+      - "${GRAFANA_BIND:-127.0.0.1}:${GRAFANA_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # --- GitLab ---------------------------------------------------------------------------------
+  # Sur le réseau de management du lab, à l'IP GITLAB_IP : http://<GITLAB_IP> et SSH sur le port 22
+  # de cette IP, depuis l'hôte comme depuis les nœuds. Sur l'hôte, seul SSH est publié (127.0.0.1:2222
+  # par défaut). À chaque démarrage, gitlab/provision/ crée ce qui manque : utilisateurs, groupe, jeton
+  # d'API. Premier démarrage : 5 minutes environ (make logs).
+  gitlab:
+    image: gitlab/gitlab-ce:19.6.1-ce.0
+    hostname: gitlab
+    shm_size: 256m
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        # URL de GitLab : http://<GITLAB_IP>, ou GITLAB_EXTERNAL_URL derrière un reverse proxy HTTPS
+        sonic_lab_url = '${GITLAB_EXTERNAL_URL:-}'
+        sonic_lab_url = 'http://${GITLAB_IP:-172.20.30.5}' if sonic_lab_url.empty?
+        external_url sonic_lab_url
+        # premier démarrage seulement (volume vide)
+        gitlab_rails['initial_root_password'] = '${GITLAB_ROOT_PASSWORD:?à définir dans .env (make init)}'
+        gitlab_rails['time_zone'] = 'Europe/Paris'
+        # pas de serveur de messagerie dans le lab
+        gitlab_rails['gitlab_email_enabled'] = false
+        gitlab_kas['enable'] = false
+        # Sobriété mémoire, d'après la doc GitLab « memory-constrained environments » : ~2,5 Go
+        puma['worker_processes'] = 0
+        sidekiq['concurrency'] = 10
+        prometheus_monitoring['enable'] = false
+        gitlab_rails['env'] = { 'MALLOC_CONF' => 'dirty_decay_ms:1000,muzzy_decay_ms:1000' }
+        gitaly['env'] = { 'MALLOC_CONF' => 'dirty_decay_ms:1000,muzzy_decay_ms:1000' }
+        if sonic_lab_url.start_with?('https://')
+          # derrière un reverse proxy (Caddy…) : le TLS s'arrête au proxy, GitLab reste en HTTP sur le
+          # port 80 et fait confiance à l'hôte (passerelle du réseau de management)
+          nginx['listen_https'] = false
+          nginx['listen_port'] = 80
+          nginx['proxy_set_headers'] = { 'X-Forwarded-Proto' => 'https', 'X-Forwarded-Ssl' => 'on' }
+          gitlab_rails['trusted_proxies'] = ['172.20.30.1']
+          letsencrypt['enable'] = false
+        end
+        # port SSH des URL de clonage : 22, celui de GITLAB_IP ; GITLAB_SSH_PORT s'il est publié ailleurs
+        gitlab_rails['gitlab_shell_ssh_port'] = ${GITLAB_SSH_PORT:-22}
+      # Configuration de base, après chaque « gitlab-ctl reconfigure » de l'image
+      GITLAB_POST_RECONFIGURE_SCRIPT: bash /opt/sonic-lab/provision.sh || true
+      GITLAB_USERS: ${GITLAB_USERS:-}
+      GITLAB_GROUP: ${GITLAB_GROUP:-ima-netw-automation-grp-3}
+      GITLAB_API_TOKEN: ${GITLAB_API_TOKEN:?à définir dans .env (make init)}
+    volumes:
+      - gitlab-config:/etc/gitlab
+      - gitlab-data:/var/opt/gitlab
+      - gitlab-logs:/var/log/gitlab
+      - ./gitlab/provision:/opt/sonic-lab:ro
+    ports:
+      # git en SSH sur l'hôte : 127.0.0.1:2222 par défaut, sans gêner le sshd de l'hôte (port 22). Sur un
+      # serveur dont le sshd écoute ailleurs : GITLAB_SSH_BIND=0.0.0.0 et GITLAB_SSH_PORT=22 dans .env.
+      - "${GITLAB_SSH_BIND:-127.0.0.1}:${GITLAB_SSH_PORT:-2222}:22"
+    networks:
+      default:
+      mgmt:
+        ipv4_address: ${GITLAB_IP:-172.20.30.5}
+    healthcheck:
+      test: ["CMD", "/opt/gitlab/bin/gitlab-healthcheck", "--fail", "--max-time", "10"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 10m
+      start_interval: 10s
+    stop_grace_period: 2m
+    restart: unless-stopped
+
+  # Dépôts GitLab <-> gitlab/repos/, versionné avec le projet : remet dans GitLab les dépôts
+  # exportés (clone neuf, git pull) et exporte ceux qu'on crée ou modifie. Voir gitlab/repos/README.md.
+  gitlab-sync:
+    build:
+      context: ./gitlab/sync
+    image: sonic-lab-gitlab-sync:latest
+    depends_on:
+      gitlab:
+        # pas service_healthy : make up n'attend pas le premier démarrage de GitLab ; le service
+        # attend lui-même que l'API réponde avec le jeton, créé en dernier par le provisioning.
+        condition: service_started
+    volumes:
+      - ./gitlab/repos:/repos
+    environment:
+      GITLAB_URL: http://gitlab
+      GITLAB_API_TOKEN: ${GITLAB_API_TOKEN:?à définir dans .env (make init)}
+      REPOS_DIR: /repos
+      SYNC_INTERVAL: ${GITLAB_SYNC_INTERVAL:-60}
+    # dernier export à l'arrêt (le service s'arrête avant GitLab)
+    stop_grace_period: 1m
+    restart: unless-stopped
+
+  # Runner GitLab (CI/CD de l'infra réseau) : s'enregistre tout seul comme runner d'instance avec
+  # GITLAB_API_TOKEN, puis lance chaque job dans un conteneur (executor docker) branché sur le réseau
+  # de management : les jobs joignent GitLab et le RESTCONF des routeurs, pas la socket Docker.
+  # Voir gitlab/runner/entrypoint.sh et le projet modèle gitlab/network-config/.
+  gitlab-runner:
+    build:
+      context: ./gitlab/runner
+    image: sonic-lab-gitlab-runner:latest
+    depends_on:
+      gitlab:
+        # comme gitlab-sync : le runner attend lui-même que l'API réponde avec le jeton
+        condition: service_started
+    volumes:
+      # Accès root à Docker : création des conteneurs des jobs.
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Jeton du runner et config.toml (régénéré à chaque démarrage).
+      - gitlab-runner-config:/etc/gitlab-runner
+    environment:
+      GITLAB_URL: http://gitlab
+      GITLAB_API_TOKEN: ${GITLAB_API_TOKEN:?à définir dans .env (make init)}
+      RUNNER_NAME: sonic-lab
+      RUNNER_TAGS: ${GITLAB_RUNNER_TAGS:-sonic-lab,restconf}
+      RUNNER_CONCURRENT: ${GITLAB_RUNNER_CONCURRENT:-2}
+      RUNNER_IMAGE: ${GITLAB_RUNNER_IMAGE:-python:3.12-alpine}
+      RUNNER_NETWORK: sonic-lab-mgmt
+      # transmis aux jobs (variables d'environnement, non masquées dans les logs) ; le collecteur sFlow
+      # est la destination des flux dans la conf déployée par la CD Ansible
+      RESTCONF_USER: ${RESTCONF_USER:-admin}
+      RESTCONF_PASSWORD: ${RESTCONF_PASSWORD:?à définir dans .env (make init)}
+      FLOW_COLLECTOR_IP: ${FLOW_COLLECTOR_IP:-172.20.30.6}
+    # SIGQUIT : arrêt propre (les jobs en cours se terminent, dans la limite du délai)
+    stop_signal: SIGQUIT
+    stop_grace_period: 1m
+    restart: unless-stopped
+
+  # Image des jobs CI du projet network-config (CD réseau avec Ansible : ansible-core, ansible-lint,
+  # pytest), construite ici et utilisée telle quelle par le runner (pull_policy if-not-present).
+  # Service ponctuel : affiche la version d'Ansible et s'arrête (« exited (0) » dans make ps). Aussi
+  # utilisée par make ansible, depuis l'hôte.
+  ansible:
+    build:
+      context: ./gitlab/ansible
+    image: sonic-lab-ansible:latest
+    command: ["ansible-playbook", "--version"]
+    restart: "no"
+
+volumes:
+  captures:
+  influxdb-data:
+  influxdb-config:
+  grafana-data:
+  gitlab-config:
+  gitlab-data:
+  gitlab-logs:
+  gitlab-runner-config:

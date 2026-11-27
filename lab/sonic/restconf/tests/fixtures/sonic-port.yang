@@ -1,0 +1,6 @@
+module sonic-port {
+  namespace "http://github.com/sonic-net/sonic-port";
+  prefix port;
+  revision 2019-07-01;
+  // extrait pour les tests du téléchargement de schéma
+}

@@ -1,0 +1,9 @@
+{#- PUT du module sonic-loopback-interface : Loopback0 et son adresse (« loopback »), rien d'autre. -#}
+{%- if loopback | default("") -%}
+{%-   set doc = {"LOOPBACK_INTERFACE": {
+        "LOOPBACK_INTERFACE_LIST": [{"name": "Loopback0"}],
+        "LOOPBACK_INTERFACE_IPPREFIX_LIST": [{"name": "Loopback0", "ip-prefix": loopback}]}} -%}
+{%- else -%}
+{%-   set doc = {} -%}
+{%- endif -%}
+{{ {"sonic-loopback-interface:sonic-loopback-interface": doc} | to_nice_json(indent=2) }}

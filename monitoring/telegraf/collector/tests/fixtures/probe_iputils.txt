@@ -1,0 +1,15 @@
+10.0.12.2 PING 10.0.12.2 (10.0.12.2) 56(84) bytes of data.
+10.0.12.2 64 bytes from 10.0.12.2: icmp_seq=1 ttl=64 time=0.221 ms
+10.0.12.2 64 bytes from 10.0.12.2: icmp_seq=2 ttl=64 time=0.245 ms
+10.0.12.2 64 bytes from 10.0.12.2: icmp_seq=3 ttl=64 time=0.315 ms
+10.0.12.2 64 bytes from 10.0.12.2: icmp_seq=4 ttl=64 time=0.249 ms
+10.0.12.2 64 bytes from 10.0.12.2: icmp_seq=5 ttl=64 time=0.282 ms
+10.0.12.2 
+10.0.12.2 --- 10.0.12.2 ping statistics ---
+10.0.12.2 5 packets transmitted, 5 received, 0% packet loss, time 830ms
+10.0.12.2 rtt min/avg/max/mdev = 0.221/0.262/0.315/0.032 ms
+192.168.9.9 PING 192.168.9.9 (192.168.9.9) 56(84) bytes of data.
+192.168.9.9 
+192.168.9.9 --- 192.168.9.9 ping statistics ---
+192.168.9.9 15 packets transmitted, 0 received, 100% packet loss, time 2910ms
+192.168.9.9 

@@ -1,0 +1,31 @@
+---
+# Rendu des documents de chaque routeur dans build/<routeur>/, sans joindre les routeurs (job lint,
+# artefact à relire dans les merge requests) : <module>.json (PUT), <module>.patch.json (PATCH), frr.conf.
+- name: Rendre les documents RESTCONF des routeurs
+  hosts: sonic
+  gather_facts: false
+  tasks:
+    - name: Rendre les documents du routeur
+      ansible.builtin.include_role:
+        name: sonic_config
+        tasks_from: render.yml
+        public: true
+
+    - name: Créer le dossier build du routeur
+      ansible.builtin.file:
+        path: "{{ sonic_config_build_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Écrire les documents
+      ansible.builtin.copy:
+        dest: "{{ sonic_config_build_dir }}/{{ render_file }}"
+        content: "{{ render_text }}"
+        mode: "0644"
+      vars:
+        render_file: "{{ 'frr.conf' if item.name == 'frr' else item.name ~ ('.patch' if item.method == 'patch' else '') ~ '.json' }}"
+        # guillemets doubles : YAML fait du \n un vrai saut de ligne (fin du fichier JSON)
+        render_text: "{{ item.content['sonic-lab:running-config'] if item.name == 'frr' else (item.content | to_nice_json(indent=2)) ~ '\n' }}"
+      loop: "{{ sonic_config_payloads }}"
+      loop_control:
+        label: "{{ item.name }}"

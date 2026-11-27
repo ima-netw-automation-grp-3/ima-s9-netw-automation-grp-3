@@ -1,0 +1,36 @@
+# Datasources Grafana, provisionnées au démarrage (le jeton vient de la variable INFLUXDB_TOKEN).
+apiVersion: 1
+
+datasources:
+  # Utilisée par tous les tableaux de bord : InfluxQL (éditeur visuel disponible dans Grafana).
+  - name: InfluxDB (InfluxQL)
+    uid: influxdb-lab
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    isDefault: true
+    database: lab
+    jsonData:
+      version: InfluxQL
+      dbName: lab
+      httpMode: POST
+      timeInterval: 10s
+      httpHeaderName1: Authorization
+    secureJsonData:
+      httpHeaderValue1: Token ${INFLUXDB_TOKEN}
+    editable: false
+
+  # Pour l'exploration en Flux (requêtes copiées depuis l'interface d'InfluxDB, par exemple).
+  - name: InfluxDB (Flux)
+    uid: influxdb-lab-flux
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    jsonData:
+      version: Flux
+      organization: sonic-lab
+      defaultBucket: lab
+      timeInterval: 10s
+    secureJsonData:
+      token: ${INFLUXDB_TOKEN}
+    editable: false

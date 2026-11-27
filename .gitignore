@@ -1,0 +1,35 @@
+# image SONiC (volumineuse, non redistribuée : voir README.md, « Image SONiC »)
+*.gz
+docker-sonic-vs.gz.part
+# créés par containerlab au déploiement
+lab/clab-*/
+lab/.runner-status
+# état et sauvegardes de l'agent GitOps
+lab/.gitops/
+# snapshots créés depuis l'interface
+lab/backups/
+# secrets du lab (make init) et réglages propres à une machine
+.env
+compose.override.yml
+docker-compose.override.yml
+# écritures en cours de gitlab-sync (les exports eux-mêmes sont versionnés : gitlab/repos/README.md)
+gitlab/repos/**/*.tmp
+# documents et topologies propres à une équipe ou à un serveur, gardés hors du dépôt public
+docs/architecture.md
+docs/revue-*.md
+topologies/
+# outils personnels et assistants de code
+CLAUDE.md
+.claude/
+.gemini/
+.impeccable/
+.vscode/
+.idea/
+*.swp
+# dépendances, builds et caches
+**/node_modules/
+web/frontend/dist/
+**/.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/

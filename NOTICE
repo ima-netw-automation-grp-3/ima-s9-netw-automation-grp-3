@@ -1,0 +1,10 @@
+init-clab : lab SONiC (containerlab, interface web, métrologie, GitLab, CI/CD réseau et GitOps)
+Copyright 2026 Alexis Déhu (xeylou) et les contributeurs du projet
+https://github.com/ima-netw-automation-grp-3/init-clab
+
+Ce travail est distribué sous la licence Apache, version 2.0 (fichier LICENSE). Toute redistribution,
+modifiée ou non, et toute œuvre dérivée doivent reproduire le présent avis (section 4 d de la licence),
+et donc mentionner son auteur, Alexis Déhu (xeylou), et le dépôt d'origine ci-dessus.
+
+L'image SONiC (docker-sonic-vs) n'est pas distribuée avec ce dépôt : elle reste soumise à ses propres
+licences.

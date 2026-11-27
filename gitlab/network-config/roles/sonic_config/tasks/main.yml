@@ -1,0 +1,17 @@
+---
+# Rendu des documents, sauvegarde de l'état courant (sauf en --check), puis application validée par le
+# routeur (en --check : le preview seul, et --diff affiche les différences calculées par le routeur).
+- name: Rendre les documents du routeur
+  ansible.builtin.import_tasks: render.yml
+
+- name: Sauvegarder l'état courant pour le rollback
+  ansible.builtin.import_tasks: backup.yml
+  when: not ansible_check_mode
+
+- name: Appliquer les documents (preview par le routeur, puis PUT ou PATCH)
+  sonic_lab.restconf.config:
+    url: "{{ restconf_url }}"
+    user: "{{ restconf_user }}"
+    password: "{{ restconf_password }}"
+    validate_certs: "{{ restconf_validate_certs }}"
+    documents: "{{ sonic_config_payloads }}"

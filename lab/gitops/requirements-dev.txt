@@ -1,0 +1,3 @@
+# Tests de l'agent GitOps (make test) ; dans le service clab, l'image fournit python3 et py3-yaml.
+PyYAML==6.0.3
+pytest==9.2.0

@@ -1,0 +1,21 @@
+---
+# Documents appliqués, dans l'ordre : CONFIG_DB (ports, loopback, interfaces, sFlow), puis FRR, comme
+# la restauration de l'interface web. path : ressource RESTCONF ; method : put remplace tout le module
+# (ou toute la conf FRR), patch fusionne sans rien retirer ; template : dans templates/ (.json.j2 :
+# document JSON RFC 7951, sinon texte de la conf FRR).
+# Pour gérer un autre module SONiC (sonic-vlan…), ajoutez son template et une entrée ici.
+sonic_config_documents:
+  - {name: sonic-port, path: "sonic-port:sonic-port", method: patch, template: sonic-port.json.j2}
+  - name: sonic-loopback-interface
+    path: "sonic-loopback-interface:sonic-loopback-interface"
+    method: put
+    template: sonic-loopback-interface.json.j2
+  - {name: sonic-interface, path: "sonic-interface:sonic-interface", method: put, template: sonic-interface.json.j2}
+  # sessions sFlow avant l'activation (PUT suivant) : sinon sflowmgrd échantillonne d'abord tous les ports
+  - {name: sonic-sflow-sessions, path: "sonic-sflow:sonic-sflow", method: patch, template: sonic-sflow-sessions.json.j2}
+  - {name: sonic-sflow, path: "sonic-sflow:sonic-sflow", method: put, template: sonic-sflow.json.j2}
+  - {name: frr, path: "sonic-lab:frr/running-config", method: put, template: frr.conf.j2}
+
+# Artefacts des jobs, à la racine du projet
+sonic_config_build_dir: "{{ playbook_dir }}/../build/{{ inventory_hostname }}"
+sonic_config_rollback_dir: "{{ playbook_dir }}/../rollback/{{ inventory_hostname }}"

@@ -1,0 +1,23 @@
+# Infra du lab SONiC en GitOps (voir README.md).
+#
+# La CI valide la topologie. Le plan et le déploiement sont faits par l'agent GitOps du lab (service
+# clab), qui publie ses résultats en statuts externes sur ce même pipeline :
+#   lab/plan    sur le commit de tête d'une branche qui a une merge request ouverte ;
+#   lab/deploy  sur chaque commit de la branche par défaut.
+# Avec « Pipelines must succeed » (activé par make infra-project), une MR dont le plan est refusé ne
+# peut pas être fusionnée.
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH # pipelines de branche : les statuts lab/* de l'agent s'y rattachent
+
+default:
+  image: python:3.12-alpine
+  tags: [sonic-lab]
+
+validate:
+  stage: test
+  interruptible: true
+  script:
+    - pip install -q --disable-pip-version-check pyyaml==6.0.3
+    - python3 ci/validate.py

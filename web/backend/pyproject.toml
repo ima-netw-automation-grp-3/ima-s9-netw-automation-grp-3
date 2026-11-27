@@ -1,0 +1,16 @@
+[project]
+name = "sonic-lab-web"
+version = "1.0.0"
+description = "Interface web de gestion du lab SONiC (containerlab)"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient` is deprecated"]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"

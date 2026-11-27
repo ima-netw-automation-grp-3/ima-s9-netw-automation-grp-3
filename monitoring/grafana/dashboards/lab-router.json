@@ -1,0 +1,4130 @@
+{
+  "uid": "lab-router",
+  "title": "Routeur SONiC",
+  "description": "Tout ce que le collecteur relève sur un routeur SONiC.",
+  "tags": [
+    "sonic-lab",
+    "routeur"
+  ],
+  "timezone": "browser",
+  "editable": true,
+  "graphTooltip": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m"
+    ]
+  },
+  "fiscalYearStartMonth": 0,
+  "liveNow": false,
+  "weekStart": "",
+  "schemaVersion": 41,
+  "version": 1,
+  "links": [
+    {
+      "type": "dashboards",
+      "tags": [
+        "sonic-lab"
+      ],
+      "asDropdown": true,
+      "title": "Tableaux du lab",
+      "includeVars": false,
+      "keepTime": true,
+      "icon": "external link",
+      "targetBlank": false,
+      "tooltip": "",
+      "url": ""
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "node",
+        "label": "Routeur",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-lab"
+        },
+        "query": "SHOW TAG VALUES FROM \"lab_sonic_port\" WITH KEY = \"node\" WHERE $timeFilter",
+        "definition": "SHOW TAG VALUES FROM \"lab_sonic_port\" WITH KEY = \"node\" WHERE $timeFilter",
+        "refresh": 2,
+        "multi": false,
+        "includeAll": false,
+        "sort": 1,
+        "hide": 0,
+        "regex": "",
+        "options": [],
+        "current": {}
+      },
+      {
+        "name": "port",
+        "label": "Interfaces",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-lab"
+        },
+        "query": "SHOW TAG VALUES FROM \"lab_interface\" WITH KEY = \"interface\" WHERE \"node\" =~ /^$node$/ AND \"if_type\" != 'wire' AND (\"linked\" = 'yes' OR \"if_type\" =~ /^(vlan|lag|loopback)$/) AND $timeFilter",
+        "definition": "SHOW TAG VALUES FROM \"lab_interface\" WITH KEY = \"interface\" WHERE \"node\" =~ /^$node$/ AND \"if_type\" != 'wire' AND (\"linked\" = 'yes' OR \"if_type\" =~ /^(vlan|lag|loopback)$/) AND $timeFilter",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "sort": 1,
+        "hide": 0,
+        "regex": "",
+        "options": [],
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        }
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-lab"
+        },
+        "enable": true,
+        "hide": false,
+        "iconColor": "orange",
+        "name": "Événements du lab",
+        "query": "SELECT \"message\", \"node\", \"type\", \"program\" FROM \"lab_event\" WHERE $timeFilter AND \"node\" =~ /^$node$/",
+        "target": {
+          "query": "SELECT \"message\", \"node\", \"type\", \"program\" FROM \"lab_event\" WHERE $timeFilter AND \"node\" =~ /^$node$/",
+          "rawQuery": true,
+          "resultFormat": "table",
+          "refId": "Anno"
+        },
+        "textColumn": "message",
+        "tagsColumn": "node,type,program"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Version SONiC",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"sonic_version\") AS \"value\" FROM \"lab_node\" WHERE \"node\" =~ /^$node$/ AND $timeFilter",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^value$/",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 4,
+        "h": 3
+      },
+      "id": 1
+    },
+    {
+      "type": "stat",
+      "title": "FRR",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"frr_version\") AS \"value\" FROM \"lab_node\" WHERE \"node\" =~ /^$node$/ AND $timeFilter",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^value$/",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 4,
+        "y": 0,
+        "w": 3,
+        "h": 3
+      },
+      "id": 2
+    },
+    {
+      "type": "stat",
+      "title": "HWSKU",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"hwsku\") AS \"value\" FROM \"lab_node\" WHERE \"node\" =~ /^$node$/ AND $timeFilter",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^value$/",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 7,
+        "y": 0,
+        "w": 3,
+        "h": 3
+      },
+      "id": 3
+    },
+    {
+      "type": "stat",
+      "title": "Uptime",
+      "description": "Depuis le démarrage du conteneur.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"uptime_s\") AS \"value\" FROM \"lab_node\" WHERE \"node\" =~ /^$node$/ AND time > now() - 1m",
+          "rawQuery": true,
+          "resultFormat": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dtdurations",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "aucune mesure depuis 1 min"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 10,
+        "y": 0,
+        "w": 3,
+        "h": 3
+      },
+      "id": 4
+    },
+    {
+      "type": "stat",
+      "title": "Prêt",
+      "description": "Bootstrap terminé (/var/run/lab-ready).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"ready\") AS \"value\" FROM \"lab_node\" WHERE \"node\" =~ /^$node$/ AND time > now() - 1m",
+          "rawQuery": true,
+          "resultFormat": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "non",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "oui",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "noValue": "aucune mesure depuis 1 min"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 13,
+        "y": 0,
+        "w": 3,
+        "h": 3
+      },
+      "id": 5
+    },
+    {
+      "type": "stat",
+      "title": "Services en échec",
+      "description": "Programmes supervisord en FATAL ou BACKOFF.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"failed\") FROM (SELECT last(\"failed\") AS \"failed\" FROM \"lab_sonic_service\" WHERE \"node\" =~ /^$node$/ AND time > now() - 1m GROUP BY \"service\")",
+          "rawQuery": true,
+          "resultFormat": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "aucune mesure depuis 1 min"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 4,
+        "h": 3
+      },
+      "id": 6
+    },
+    {
+      "type": "stat",
+      "title": "Sessions BGP",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"e\") FROM (SELECT last(\"established\") AS \"e\" FROM \"lab_bgp_peer\" WHERE \"node\" =~ /^$node$/ AND time > now() - 1m GROUP BY \"vrf\", \"peer\")",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "établies"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT count(\"e\") FROM (SELECT last(\"established\") AS \"e\" FROM \"lab_bgp_peer\" WHERE \"node\" =~ /^$node$/ AND time > now() - 1m GROUP BY \"vrf\", \"peer\")",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "configurées"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [],
+          "noValue": "aucune mesure depuis 1 min"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "value_and_name",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "gridPos": {
+        "x": 20,
+        "y": 0,
+        "w": 4,
+        "h": 3
+      },
+      "id": 7
+    },
+    {
+      "type": "row",
+      "title": "Ports et interfaces",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 3,
+        "w": 24,
+        "h": 1
+      },
+      "id": 8
+    },
+    {
+      "type": "table",
+      "title": "État des ports (CONFIG_DB, APPL_DB, STATE_DB)",
+      "description": "Tous les ports du routeur, câblés ou non. Un port est câblé quand un fil containerlab (ethN) lui correspond.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"index\") AS \"index\", last(\"admin_up\") AS \"admin\", last(\"oper_up\") AS \"oper\", last(\"speed_mbps\") AS \"speed\", last(\"mtu\") AS \"mtu\", last(\"description\") AS \"description\", last(\"cabled\") AS \"cabled\", last(\"appl_flap_count\") AS \"flaps\", last(\"lanes\") AS \"lanes\" FROM \"lab_sonic_port\" WHERE \"node\" =~ /^$node$/ AND time > now() - 1m GROUP BY \"port\", \"alias\", \"wire\"",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "index": true
+            },
+            "indexByName": {
+              "port": 0,
+              "alias": 1,
+              "wire": 2,
+              "admin": 3,
+              "oper": 4,
+              "speed": 5,
+              "mtu": 6,
+              "description": 7,
+              "cabled": 8,
+              "flaps": 9,
+              "lanes": 10
+            },
+            "renameByName": {
+              "port": "Port",
+              "alias": "Alias",
+              "wire": "Fil",
+              "admin": "Admin",
+              "oper": "Oper",
+              "speed": "Vitesse",
+              "mtu": "MTU",
+              "description": "Description",
+              "cabled": "Câblé",
+              "flaps": "Changements d'état",
+              "lanes": "Lanes"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "—"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Admin"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "down",
+                        "color": "red",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "up",
+                        "color": "green",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Oper"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "down",
+                        "color": "red",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "up",
+                        "color": "green",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Câblé"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "non",
+                        "color": "text",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "oui",
+                        "color": "green",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Vitesse"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "Mbits"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "Câblé",
+            "desc": true
+          }
+        ]
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 7
+      },
+      "id": 9
+    },
+    {
+      "type": "timeseries",
+      "title": "Débit par interface",
+      "description": "Compteurs noyau des ports SONiC : émission (tx) au-dessus de l'axe, réception (rx) en dessous.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"rx_bps\") AS \"rx\", mean(\"tx_bps\") AS \"tx\" FROM \"lab_interface\" WHERE \"node\" =~ /^$node$/ AND \"interface\" =~ /^$port$/ AND $timeFilter GROUP BY time($__interval), \"interface\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_interface $col"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".* rx$"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 11,
+        "w": 12,
+        "h": 8
+      },
+      "id": 10
+    },
+    {
+      "type": "timeseries",
+      "title": "Paquets par seconde",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"rx_pps\") AS \"rx\", mean(\"tx_pps\") AS \"tx\" FROM \"lab_interface\" WHERE \"node\" =~ /^$node$/ AND \"interface\" =~ /^$port$/ AND $timeFilter GROUP BY time($__interval), \"interface\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_interface $col"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".* rx$"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 11,
+        "w": 12,
+        "h": 8
+      },
+      "id": 11
+    },
+    {
+      "type": "timeseries",
+      "title": "Erreurs et pertes (/s)",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"rx_errors_ps\") AS \"rx erreurs\", mean(\"tx_errors_ps\") AS \"tx erreurs\", mean(\"rx_dropped_ps\") AS \"rx pertes\", mean(\"tx_dropped_ps\") AS \"tx pertes\" FROM \"lab_interface\" WHERE \"node\" =~ /^$node$/ AND \"interface\" =~ /^$port$/ AND $timeFilter GROUP BY time($__interval), \"interface\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_interface $col"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 12,
+        "h": 7
+      },
+      "id": 12
+    },
+    {
+      "type": "timeseries",
+      "title": "Utilisation des ports",
+      "description": "Débit rapporté à la vitesse configurée du port (CONFIG_DB).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"rx_util_pct\") AS \"rx\", mean(\"tx_util_pct\") AS \"tx\" FROM \"lab_interface\" WHERE \"node\" =~ /^$node$/ AND \"interface\" =~ /^$port$/ AND $timeFilter GROUP BY time($__interval), \"interface\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_interface $col"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 19,
+        "w": 12,
+        "h": 7
+      },
+      "id": 13
+    },
+    {
+      "type": "timeseries",
+      "title": "Compteurs SAI des ports (COUNTERS_DB)",
+      "description": "Compteurs natifs de SONiC (flex counters PORT_STAT), ceux de « show interfaces counters ».",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT non_negative_derivative(last(\"SAI_PORT_STAT_IF_IN_OCTETS\"), 1s) * 8 AS \"in\", non_negative_derivative(last(\"SAI_PORT_STAT_IF_OUT_OCTETS\"), 1s) * 8 AS \"out\" FROM \"lab_sonic_counters\" WHERE \"node\" =~ /^$node$/ AND \"source\" = 'COUNTERS' AND \"object_type\" = 'PORT' AND \"object\" =~ /^$port$/ AND $timeFilter GROUP BY time($__interval), \"object\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_object $col"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".* in$"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 26,
+        "w": 12,
+        "h": 7
+      },
+      "id": 14
+    },
+    {
+      "type": "timeseries",
+      "title": "Rejets et erreurs SAI (/s)",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT non_negative_derivative(last(\"SAI_PORT_STAT_IF_IN_DISCARDS\"), 1s) AS \"in rejets\", non_negative_derivative(last(\"SAI_PORT_STAT_IF_IN_ERRORS\"), 1s) AS \"in erreurs\", non_negative_derivative(last(\"SAI_PORT_STAT_IF_OUT_DISCARDS\"), 1s) AS \"out rejets\", non_negative_derivative(last(\"SAI_PORT_STAT_IF_OUT_ERRORS\"), 1s) AS \"out erreurs\" FROM \"lab_sonic_counters\" WHERE \"node\" =~ /^$node$/ AND \"source\" = 'COUNTERS' AND \"object_type\" = 'PORT' AND \"object\" =~ /^$port$/ AND $timeFilter GROUP BY time($__interval), \"object\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_object $col"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 26,
+        "w": 12,
+        "h": 7
+      },
+      "id": 15
+    },
+    {
+      "type": "row",
+      "title": "BGP",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 33,
+        "w": 24,
+        "h": 1
+      },
+      "id": 16
+    },
+    {
+      "type": "state-timeline",
+      "title": "État des sessions",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"state_code\") FROM \"lab_bgp_peer\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval), \"vrf\", \"peer\" fill(previous)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_peer ($tag_vrf)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Inconnu",
+                  "color": "text",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Idle",
+                  "color": "red",
+                  "index": 1
+                },
+                "2": {
+                  "text": "Connect",
+                  "color": "orange",
+                  "index": 2
+                },
+                "3": {
+                  "text": "Active",
+                  "color": "orange",
+                  "index": 3
+                },
+                "4": {
+                  "text": "OpenSent",
+                  "color": "yellow",
+                  "index": 4
+                },
+                "5": {
+                  "text": "OpenConfirm",
+                  "color": "yellow",
+                  "index": 5
+                },
+                "6": {
+                  "text": "Established",
+                  "color": "green",
+                  "index": 6
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 75,
+            "lineWidth": 0
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "never",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 34,
+        "w": 12,
+        "h": 5
+      },
+      "id": 17
+    },
+    {
+      "type": "table",
+      "title": "Voisins",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"state\") AS \"state\", last(\"uptime_s\") AS \"uptime\", last(\"description\") AS \"description\", last(\"connections_established\") AS \"est\", last(\"connections_dropped\") AS \"dropped\", last(\"last_reset\") AS \"reset\", last(\"rtt_ms\") AS \"rtt\", last(\"hold_time_s\") AS \"hold\" FROM \"lab_bgp_peer\" WHERE \"node\" =~ /^$node$/ AND time > now() - 1m GROUP BY \"vrf\", \"peer\", \"remote_as\", \"peer_type\"",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "peer": 0,
+              "remote_as": 1,
+              "peer_type": 2,
+              "vrf": 3,
+              "state": 4,
+              "uptime": 5,
+              "description": 6,
+              "est": 7,
+              "dropped": 8,
+              "reset": 9,
+              "rtt": 10,
+              "hold": 11
+            },
+            "renameByName": {
+              "peer": "Voisin",
+              "remote_as": "AS",
+              "peer_type": "Type",
+              "vrf": "VRF",
+              "state": "État",
+              "uptime": "Uptime",
+              "description": "Description",
+              "est": "Établies",
+              "dropped": "Coupées",
+              "reset": "Dernier reset",
+              "rtt": "RTT (ms)",
+              "hold": "Hold (s)"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "—"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Uptime"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dtdurations"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 34,
+        "w": 12,
+        "h": 5
+      },
+      "id": 18
+    },
+    {
+      "type": "timeseries",
+      "title": "Préfixes reçus et envoyés",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"pfx_rcd\") AS \"reçus\", last(\"pfx_snt\") AS \"envoyés\" FROM \"lab_bgp_afi\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval), \"peer\", \"afi\" fill(previous)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_peer $tag_afi $col"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0,
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 39,
+        "w": 8,
+        "h": 7
+      },
+      "id": 19
+    },
+    {
+      "type": "timeseries",
+      "title": "Messages BGP (/s)",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT non_negative_derivative(last(\"updates_recv\"), 1s) AS \"updates reçus\", non_negative_derivative(last(\"updates_sent\"), 1s) AS \"updates envoyés\", non_negative_derivative(last(\"keepalives_recv\"), 1s) AS \"keepalives reçus\", non_negative_derivative(last(\"keepalives_sent\"), 1s) AS \"keepalives envoyés\", non_negative_derivative(last(\"notifications_recv\"), 1s) AS \"notifications reçues\", non_negative_derivative(last(\"notifications_sent\"), 1s) AS \"notifications envoyées\" FROM \"lab_bgp_peer\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval), \"peer\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_peer $col"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 2,
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 39,
+        "w": 8,
+        "h": 7
+      },
+      "id": 20
+    },
+    {
+      "type": "timeseries",
+      "title": "RTT TCP estimé par FRR (ms)",
+      "description": "Estimation de FRR à partir de la session TCP (souvent 0 dans un lab : moins d'une milliseconde).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"rtt_ms\") FROM \"lab_bgp_peer\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval), \"peer\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_peer"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 39,
+        "w": 8,
+        "h": 7
+      },
+      "id": 21
+    },
+    {
+      "type": "row",
+      "title": "Routage",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 46,
+        "w": 24,
+        "h": 1
+      },
+      "id": 22
+    },
+    {
+      "type": "timeseries",
+      "title": "Routes installées (FIB) par protocole",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"fib\") FROM \"lab_route\" WHERE \"node\" =~ /^$node$/ AND \"protocol\" != 'total' AND $timeFilter GROUP BY time($__interval), \"afi\", \"protocol\" fill(previous)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_afi $tag_protocol"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 25,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0,
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 47,
+        "w": 8,
+        "h": 7
+      },
+      "id": 23
+    },
+    {
+      "type": "timeseries",
+      "title": "Programmation des routes : FRR → APPL_DB → ASIC_DB",
+      "description": "FRR pousse ses routes vers APPL_DB (fpmsyncd), orchagent les programme dans ASIC_DB. Les totaux diffèrent par construction (routes noyau, connectées, management), mais doivent bouger ensemble.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"fib\") FROM (SELECT last(\"fib\") AS \"fib\" FROM \"lab_route\" WHERE \"node\" =~ /^$node$/ AND \"protocol\" = 'total' AND $timeFilter GROUP BY time($__interval), \"afi\", \"vrf\") GROUP BY time($__interval)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "FRR (FIB, IPv4 + IPv6)"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"keys\") FROM \"lab_sonic_db\" WHERE \"node\" =~ /^$node$/ AND \"db\" = 'APPL_DB' AND \"table\" = 'ROUTE_TABLE' AND $timeFilter GROUP BY time($__interval) fill(previous)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "APPL_DB ROUTE_TABLE"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"keys\") FROM \"lab_sonic_db\" WHERE \"node\" =~ /^$node$/ AND \"db\" = 'ASIC_DB' AND \"table\" = 'ASIC_STATE:SAI_OBJECT_TYPE_ROUTE_ENTRY' AND $timeFilter GROUP BY time($__interval) fill(previous)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "ASIC_DB ROUTE_ENTRY"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0,
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 47,
+        "w": 8,
+        "h": 7
+      },
+      "id": 24
+    },
+    {
+      "type": "timeseries",
+      "title": "Voisins ARP / NDP",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"count\") FROM (SELECT last(\"count\") AS \"count\" FROM \"lab_neighbor\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval), \"interface\", \"family\", \"state\") GROUP BY time($__interval), \"family\", \"state\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_family $tag_state"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 25,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0,
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 47,
+        "w": 8,
+        "h": 7
+      },
+      "id": 25
+    },
+    {
+      "type": "table",
+      "title": "Table de routage (FRR)",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"via\") AS \"via\", last(\"interfaces\") AS \"ifaces\", last(\"distance\") AS \"distance\", last(\"metric\") AS \"metric\", last(\"selected\") AS \"selected\", last(\"installed\") AS \"installed\", last(\"uptime_s\") AS \"age\" FROM \"lab_route_entry\" WHERE \"node\" =~ /^$node$/ AND time > now() - 1m GROUP BY \"vrf\", \"afi\", \"prefix\", \"protocol\"",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "vrf": 0,
+              "afi": 1,
+              "prefix": 2,
+              "protocol": 3,
+              "via": 4,
+              "ifaces": 5,
+              "distance": 6,
+              "metric": 7,
+              "selected": 8,
+              "installed": 9,
+              "age": 10
+            },
+            "renameByName": {
+              "vrf": "VRF",
+              "afi": "Famille",
+              "prefix": "Préfixe",
+              "protocol": "Protocole",
+              "via": "Via",
+              "ifaces": "Interfaces",
+              "distance": "Distance",
+              "metric": "Métrique",
+              "selected": "Sélectionnée",
+              "installed": "Installée",
+              "age": "Âge"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "—"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sélectionnée"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "non",
+                        "color": "text",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "oui",
+                        "color": "green",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Installée"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "non",
+                        "color": "text",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "oui",
+                        "color": "green",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Âge"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dtdurations"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "Préfixe",
+            "desc": false
+          }
+        ]
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 54,
+        "w": 24,
+        "h": 8
+      },
+      "id": 26
+    },
+    {
+      "type": "row",
+      "title": "SONiC : bases redis, ressources (CRM), LLDP",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 62,
+        "w": 24,
+        "h": 1
+      },
+      "id": 27
+    },
+    {
+      "type": "bargauge",
+      "title": "Ressources CRM utilisées",
+      "description": "Critical Resource Monitoring : entrées utilisées sur la capacité de l'ASIC (virtuel ici).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"used_pct\") FROM \"lab_sonic_crm\" WHERE \"node\" =~ /^$node$/ AND \"stage\" = '' AND time > now() - 1m GROUP BY \"resource\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_resource"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "noValue": "aucune mesure depuis 1 min"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true,
+        "valueMode": "color",
+        "namePlacement": "left",
+        "sizing": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "maxVizHeight": 300
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 63,
+        "w": 8,
+        "h": 9
+      },
+      "id": 28
+    },
+    {
+      "type": "table",
+      "title": "Clés par base et par table",
+      "description": "Toutes les bases redis de SONiC. Une table qui apparaît (VLAN, PORTCHANNEL, ACL…) est relevée sans configuration.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"keys\") AS \"keys\" FROM \"lab_sonic_db\" WHERE \"node\" =~ /^$node$/ AND time > now() - 1m GROUP BY \"db\", \"table\"",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "db": 0,
+              "table": 1,
+              "keys": 2
+            },
+            "renameByName": {
+              "db": "Base",
+              "table": "Table",
+              "keys": "Clés"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "—"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "Clés",
+            "desc": true
+          }
+        ]
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 63,
+        "w": 8,
+        "h": 9
+      },
+      "id": 29
+    },
+    {
+      "type": "timeseries",
+      "title": "Redis : mémoire et opérations",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"used_memory\") FROM \"lab_sonic_redis\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "mémoire utilisée"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"instantaneous_ops_per_sec\") FROM \"lab_sonic_redis\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "opérations/s"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"connected_clients\") FROM \"lab_sonic_redis\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "clients connectés"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "opérations/s"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "clients connectés"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "lastNotNull"
+          ],
+          "sortBy": "",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 63,
+        "w": 8,
+        "h": 9
+      },
+      "id": 30
+    },
+    {
+      "type": "table",
+      "title": "Voisins LLDP",
+      "description": "Dans cette image, LLDP ne voit que le réseau de management (eth0).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"remote_mgmt_ip\") AS \"mgmt\", last(\"remote_port_id\") AS \"port_id\", last(\"remote_chassis_id\") AS \"chassis\" FROM \"lab_sonic_lldp\" WHERE \"node\" =~ /^$node$/ AND time > now() - 1m GROUP BY \"local_port\", \"remote_system\", \"remote_port\"",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "local_port": "Port local",
+              "remote_system": "Système distant",
+              "remote_port": "Port distant",
+              "mgmt": "IP mgmt",
+              "port_id": "ID de port",
+              "chassis": "Châssis"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 72,
+        "w": 12,
+        "h": 5
+      },
+      "id": 31
+    },
+    {
+      "type": "table",
+      "title": "Compteurs de notifications (COUNTERS_DB)",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"received\") AS \"received\", last(\"admitted\") AS \"admitted\", last(\"dropped_allowlist\") AS \"dropped\" FROM \"lab_sonic_counters\" WHERE \"node\" =~ /^$node$/ AND \"source\" = 'NOTIFICATION_CONSUMER_STATS' AND time > now() - 1m GROUP BY \"object_type\", \"object\"",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "object_type": "Orch",
+              "object": "Notification",
+              "received": "Reçues",
+              "admitted": "Admises",
+              "dropped": "Écartées"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "—"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 72,
+        "w": 12,
+        "h": 5
+      },
+      "id": 32
+    },
+    {
+      "type": "row",
+      "title": "Services supervisord",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 77,
+        "w": 24,
+        "h": 1
+      },
+      "id": 33
+    },
+    {
+      "type": "table",
+      "title": "Services",
+      "description": "Certains programmes s'arrêtent normalement après le démarrage (EXITED : start.sh, zsocket…) ou ne démarrent pas dans cette image (STOPPED).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"state_code\") AS \"state\", last(\"uptime_s\") AS \"uptime\", last(\"cpu_pct\") AS \"cpu\", last(\"rss_bytes\") AS \"rss\", last(\"threads\") AS \"threads\", last(\"processes\") AS \"procs\", last(\"fds\") AS \"fds\", last(\"pid\") AS \"pid\" FROM \"lab_sonic_service\" WHERE \"node\" =~ /^$node$/ AND time > now() - 1m GROUP BY \"service\"",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "service": 0,
+              "state": 1,
+              "uptime": 2,
+              "cpu": 3,
+              "rss": 4,
+              "threads": 5,
+              "procs": 6,
+              "fds": 7,
+              "pid": 8
+            },
+            "renameByName": {
+              "service": "Service",
+              "state": "État",
+              "uptime": "Uptime",
+              "cpu": "CPU",
+              "rss": "Mémoire (RSS)",
+              "threads": "Threads",
+              "procs": "Processus",
+              "fds": "Descripteurs",
+              "pid": "PID"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "—"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "État"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "STOPPED",
+                        "color": "text",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "STARTING",
+                        "color": "blue",
+                        "index": 1
+                      },
+                      "2": {
+                        "text": "RUNNING",
+                        "color": "green",
+                        "index": 2
+                      },
+                      "3": {
+                        "text": "BACKOFF",
+                        "color": "orange",
+                        "index": 3
+                      },
+                      "4": {
+                        "text": "STOPPING",
+                        "color": "yellow",
+                        "index": 4
+                      },
+                      "5": {
+                        "text": "EXITED",
+                        "color": "#8e8e9e",
+                        "index": 5
+                      },
+                      "6": {
+                        "text": "FATAL",
+                        "color": "red",
+                        "index": 6
+                      },
+                      "7": {
+                        "text": "UNKNOWN",
+                        "color": "text",
+                        "index": 7
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Uptime"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dtdurations"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Mémoire (RSS)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "CPU",
+            "desc": true
+          }
+        ]
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 78,
+        "w": 12,
+        "h": 11
+      },
+      "id": 34
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU par service",
+      "description": "Temps CPU du programme et de ses processus fils, en % d'un cœur.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"cpu_pct\") FROM \"lab_sonic_service\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval), \"service\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_service"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 78,
+        "w": 12,
+        "h": 11
+      },
+      "id": 35
+    },
+    {
+      "type": "timeseries",
+      "title": "Mémoire (RSS) par service",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"rss_bytes\") FROM \"lab_sonic_service\" WHERE \"node\" =~ /^$node$/ AND \"running\" = 1 AND $timeFilter GROUP BY time($__interval), \"service\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_service"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 89,
+        "w": 24,
+        "h": 8
+      },
+      "id": 36
+    },
+    {
+      "type": "state-timeline",
+      "title": "État des services",
+      "description": "Un programme qui passe en BACKOFF ou FATAL apparaît en orange ou en rouge.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT last(\"state_code\") FROM \"lab_sonic_service\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval), \"service\" fill(previous)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_service"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "STOPPED",
+                  "color": "text",
+                  "index": 0
+                },
+                "1": {
+                  "text": "STARTING",
+                  "color": "blue",
+                  "index": 1
+                },
+                "2": {
+                  "text": "RUNNING",
+                  "color": "green",
+                  "index": 2
+                },
+                "3": {
+                  "text": "BACKOFF",
+                  "color": "orange",
+                  "index": 3
+                },
+                "4": {
+                  "text": "STOPPING",
+                  "color": "yellow",
+                  "index": 4
+                },
+                "5": {
+                  "text": "EXITED",
+                  "color": "#8e8e9e",
+                  "index": 5
+                },
+                "6": {
+                  "text": "FATAL",
+                  "color": "red",
+                  "index": 6
+                },
+                "7": {
+                  "text": "UNKNOWN",
+                  "color": "text",
+                  "index": 7
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 75,
+            "lineWidth": 0
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "never",
+        "alignValue": "left",
+        "rowHeight": 0.9,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 97,
+        "w": 24,
+        "h": 16
+      },
+      "id": 37
+    },
+    {
+      "type": "row",
+      "title": "Journal système (syslog) et événements",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 113,
+        "w": 24,
+        "h": 1
+      },
+      "id": 38
+    },
+    {
+      "type": "timeseries",
+      "title": "Lignes de syslog par sévérité (/min)",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"rate\") FROM (SELECT non_negative_derivative(last(\"lines_total\"), 1m) AS \"rate\" FROM \"lab_syslog\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval), \"program\", \"severity\") GROUP BY time($__interval), \"severity\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_severity"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "bars",
+            "lineWidth": 1,
+            "fillOpacity": 30,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 1,
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "EMERG"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "dark-red"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ALERT"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "dark-red"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CRIT"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "dark-red"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ERR"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "WARNING"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "NOTICE"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "INFO"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#8e8e9e"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DEBUG"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#8e8e9e"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 114,
+        "w": 12,
+        "h": 7
+      },
+      "id": 39
+    },
+    {
+      "type": "timeseries",
+      "title": "Lignes de syslog par programme (/min)",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT sum(\"rate\") FROM (SELECT non_negative_derivative(last(\"lines_total\"), 1m) AS \"rate\" FROM \"lab_syslog\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval), \"program\", \"severity\") GROUP BY time($__interval), \"program\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_program"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 1,
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 114,
+        "w": 12,
+        "h": 7
+      },
+      "id": 40
+    },
+    {
+      "type": "table",
+      "title": "Événements du routeur",
+      "description": "Les 100 derniers événements du routeur, quelle que soit la période affichée : lignes de syslog notables (ports, bootstrap) et changements d'état détectés par le collecteur (BGP, nœud).",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT \"type\", \"severity\", \"program\", \"message\" FROM \"lab_event\" WHERE \"node\" =~ /^$node$/ AND time > now() - 30d ORDER BY time DESC LIMIT 100",
+          "rawQuery": true,
+          "resultFormat": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": false
+            },
+            "indexByName": {},
+            "renameByName": {
+              "type": "Type",
+              "severity": "Sévérité",
+              "program": "Programme",
+              "message": "Message",
+              "Time": "Date"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucun événement enregistré"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sévérité"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "EMERG": {
+                        "color": "dark-red",
+                        "index": 0
+                      },
+                      "ALERT": {
+                        "color": "dark-red",
+                        "index": 1
+                      },
+                      "CRIT": {
+                        "color": "dark-red",
+                        "index": 2
+                      },
+                      "ERR": {
+                        "color": "red",
+                        "index": 3
+                      },
+                      "WARNING": {
+                        "color": "orange",
+                        "index": 4
+                      },
+                      "NOTICE": {
+                        "color": "blue",
+                        "index": 5
+                      },
+                      "INFO": {
+                        "color": "#8e8e9e",
+                        "index": 6
+                      },
+                      "DEBUG": {
+                        "color": "#8e8e9e",
+                        "index": 7
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "Date",
+            "desc": true
+          }
+        ]
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 121,
+        "w": 24,
+        "h": 8
+      },
+      "id": 41
+    },
+    {
+      "type": "row",
+      "title": "Conteneur",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "x": 0,
+        "y": 129,
+        "w": 24,
+        "h": 1
+      },
+      "id": 42
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU du conteneur",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"usage_percent\") FROM \"docker_container_cpu\" WHERE \"node\" =~ /^$node$/ AND \"cpu\" = 'cpu-total' AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "CPU"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 130,
+        "w": 8,
+        "h": 7
+      },
+      "id": 43
+    },
+    {
+      "type": "timeseries",
+      "title": "Mémoire du conteneur",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"usage\") FROM \"docker_container_mem\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "utilisée"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT mean(\"limit\") FROM \"docker_container_mem\" WHERE \"node\" =~ /^$node$/ AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "limite"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 130,
+        "w": 8,
+        "h": 7
+      },
+      "id": 44
+    },
+    {
+      "type": "timeseries",
+      "title": "Réseau du conteneur (toutes interfaces)",
+      "description": "",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-lab"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-lab"
+          },
+          "query": "SELECT non_negative_derivative(last(\"rx_bytes\"), 1s) * 8 AS \"rx\", non_negative_derivative(last(\"tx_bytes\"), 1s) * 8 AS \"tx\" FROM \"docker_container_net\" WHERE \"node\" =~ /^$node$/ AND \"network\" = 'total' AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$col"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "pointSize": 4,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "axisBorderShow": false,
+            "axisPlacement": "auto",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "aucune donnée sur la période"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "^rx$"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ],
+          "sortBy": "Max",
+          "sortDesc": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 130,
+        "w": 8,
+        "h": 7
+      },
+      "id": 45
+    }
+  ]
+}

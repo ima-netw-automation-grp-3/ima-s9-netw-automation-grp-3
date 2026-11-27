@@ -1,0 +1,4 @@
+# Outils des jobs CI du projet network-config (image sonic-lab-ansible) et de ses tests (make test).
+ansible-core==2.21.6
+ansible-lint==26.11.0
+pytest==9.2.0

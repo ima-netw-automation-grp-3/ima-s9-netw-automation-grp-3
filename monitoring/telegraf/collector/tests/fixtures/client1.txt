@@ -1,0 +1,85 @@
+@meta
+uptime=17396.92
+hostname=client1
+kernel=7.2.15-1-omarchy
+os=Alpine Linux v3.22
+processes=495
+@netdev
+if eth0 operstate up
+if eth0 carrier 1
+if eth0 mtu 1500
+if eth0 speed 10000
+if eth0 flags 0x1003
+if eth0 address 92:19:8c:eb:c0:e8
+stat eth0 collisions 0
+stat eth0 multicast 0
+stat eth0 rx_bytes 106810
+stat eth0 rx_compressed 0
+stat eth0 rx_crc_errors 0
+stat eth0 rx_dropped 174
+stat eth0 rx_errors 0
+stat eth0 rx_fifo_errors 0
+stat eth0 rx_frame_errors 0
+stat eth0 rx_length_errors 0
+stat eth0 rx_missed_errors 0
+stat eth0 rx_nohandler 0
+stat eth0 rx_over_errors 0
+stat eth0 rx_packets 661
+stat eth0 tx_aborted_errors 0
+stat eth0 tx_bytes 900
+stat eth0 tx_carrier_errors 0
+stat eth0 tx_compressed 0
+stat eth0 tx_dropped 0
+stat eth0 tx_errors 0
+stat eth0 tx_fifo_errors 0
+stat eth0 tx_heartbeat_errors 0
+stat eth0 tx_packets 13
+stat eth0 tx_window_errors 0
+if eth1 operstate up
+if eth1 carrier 1
+if eth1 mtu 9100
+if eth1 speed 10000
+if eth1 flags 0x1003
+if eth1 address aa:c1:ab:c3:10:a0
+stat eth1 collisions 0
+stat eth1 multicast 0
+stat eth1 rx_bytes 39352
+stat eth1 rx_compressed 0
+stat eth1 rx_crc_errors 0
+stat eth1 rx_dropped 87
+stat eth1 rx_errors 0
+stat eth1 rx_fifo_errors 0
+stat eth1 rx_frame_errors 0
+stat eth1 rx_length_errors 0
+stat eth1 rx_missed_errors 0
+stat eth1 rx_nohandler 0
+stat eth1 rx_over_errors 0
+stat eth1 rx_packets 279
+stat eth1 tx_aborted_errors 0
+stat eth1 tx_bytes 19174
+stat eth1 tx_carrier_errors 0
+stat eth1 tx_compressed 0
+stat eth1 tx_dropped 0
+stat eth1 tx_errors 0
+stat eth1 tx_fifo_errors 0
+stat eth1 tx_heartbeat_errors 0
+stat eth1 tx_packets 206
+stat eth1 tx_window_errors 0
+@addr
+1: lo    inet 127.0.0.1/8 scope host lo\       valid_lft forever preferred_lft forever
+1: lo    inet6 ::1/128 scope host \       valid_lft forever preferred_lft forever
+2: eth0    inet 172.20.30.21/24 brd 172.20.30.255 scope global eth0\       valid_lft forever preferred_lft forever
+138: eth1    inet 192.168.1.10/24 scope global eth1\       valid_lft forever preferred_lft forever
+138: eth1    inet6 fe80::a8c1:abff:fec3:10a0/64 scope link \       valid_lft forever preferred_lft forever
+@route4
+default via 172.20.30.1 dev eth0 
+10.0.0.0/8 via 192.168.1.1 dev eth1 
+172.20.30.0/24 dev eth0 scope link  src 172.20.30.21 
+192.168.0.0/16 via 192.168.1.1 dev eth1 
+192.168.1.0/24 dev eth1 scope link  src 192.168.1.10 
+@route6
+fe80::/64 dev eth1  metric 256 
+@neigh
+192.168.1.1 dev eth1 lladdr 0a:f6:9c:28:64:c1 ref 1 used 0/0/0 probes 1 REACHABLE
+172.20.30.22 dev eth0 lladdr 8a:0a:12:0a:38:62 used 0/0/0 probes 4 STALE
+@end

@@ -1,0 +1,24 @@
+---
+# sonic2 : AS 65002, relié à client2 (Ethernet0) et à sonic1 (Ethernet4).
+ports:
+  - {name: Ethernet0, description: client2}
+  - {name: Ethernet4, description: sonic1}
+
+interfaces:
+  - {name: Ethernet0, ip: 192.168.2.1/24}
+  - {name: Ethernet4, ip: 10.0.12.2/30}
+
+loopback: 10.255.0.2/32
+
+bgp:
+  asn: 65002
+  router_id: 10.255.0.2
+  neighbors:
+    - {address: 10.0.12.1, remote_as: 65001, description: sonic1}
+  networks:
+    - 10.255.0.2/32
+    - 192.168.2.0/24
+
+verify:
+  ping:
+    - {destination: 192.168.1.10, source: 192.168.2.1}

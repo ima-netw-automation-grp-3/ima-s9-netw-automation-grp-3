@@ -1,0 +1,24 @@
+---
+# Documents RESTCONF du routeur, rendus depuis ses host_vars : liste sonic_config_payloads
+# (name, path, method, content), dans l'ordre de sonic_config_documents. Sans « bgp », pas de conf
+# FRR : un PUT vide l'effacerait.
+- name: Repartir d'une liste vide
+  ansible.builtin.set_fact:
+    sonic_config_payloads: []
+
+- name: Rendre les documents RESTCONF (templates et host_vars)
+  ansible.builtin.set_fact:
+    sonic_config_payloads: "{{ sonic_config_payloads + [sonic_config_doc] }}"
+  vars:
+    sonic_config_text: "{{ lookup('ansible.builtin.template', item.template) }}"
+    sonic_config_doc:
+      name: "{{ item.name }}"
+      path: "{{ item.path }}"
+      method: "{{ item.method }}"
+      content: >-
+        {{ (sonic_config_text | from_json) if item.template is search('[.]json[.]j2$')
+           else {'sonic-lab:running-config': sonic_config_text} }}
+  loop: "{{ sonic_config_documents }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.name != 'frr' or bgp is defined

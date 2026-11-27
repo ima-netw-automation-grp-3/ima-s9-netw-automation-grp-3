@@ -1,0 +1,2 @@
+# Tests de la synchronisation (make test) ; à l'exécution, seule la bibliothèque standard est utilisée.
+pytest==9.2.0

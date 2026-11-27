@@ -1,0 +1,57 @@
+---
+# Vérification après déploiement, en lecture seule (s'exécute aussi en --check) : chaque voisin BGP des
+# host_vars doit être Established, et chaque ping de verify.ping passer sans perte (depuis le routeur,
+# opération sonic-lab:ping). On réessaie pendant verify_timeout secondes : convergence BGP.
+- name: Vérifier les routeurs (BGP, pings)
+  hosts: sonic
+  gather_facts: false
+  module_defaults:
+    ansible.builtin.uri:
+      url_username: "{{ restconf_user }}"
+      url_password: "{{ restconf_password }}"
+      force_basic_auth: true
+      validate_certs: "{{ restconf_validate_certs }}"
+      headers:
+        Accept: application/yang-data+json
+      timeout: 60
+  vars:
+    verify_peers: "{{ bgp.neighbors | default([]) | map(attribute='address') | list }}"
+  tasks:
+    - name: Attendre que les sessions BGP soient établies
+      ansible.builtin.uri:
+        url: "{{ restconf_url }}/data/sonic-lab:frr/state"
+      register: verify_bgp
+      check_mode: false
+      until: >-
+        (verify_bgp.json['sonic-lab:state']['bgp-neighbor'] | default([])
+         | selectattr('address', 'in', verify_peers) | selectattr('state', 'equalto', 'Established')
+         | list | length) == (verify_peers | length)
+      retries: "{{ (verify_timeout | int / 10) | round(0, 'ceil') | int }}"
+      delay: 10
+      when: verify_peers | length > 0
+
+    - name: Afficher l'état des sessions BGP
+      ansible.builtin.debug:
+        msg: >-
+          {{ verify_bgp.json['sonic-lab:state']['bgp-neighbor'] | default([])
+             | map(attribute='address') | zip(verify_bgp.json['sonic-lab:state']['bgp-neighbor'] | default([])
+             | map(attribute='state')) | map('join', ' : ') | list }}
+      when: verify_peers | length > 0
+
+    - name: Pings depuis le routeur (sonic-lab:ping)
+      ansible.builtin.uri:
+        url: "{{ restconf_url }}/operations/sonic-lab:ping"
+        method: POST
+        body_format: json
+        body:
+          sonic-lab:input: "{{ {'destination': item.destination, 'count': 3} | combine({'source': item.source} if item.source is defined else {}) }}"
+      register: verify_ping
+      check_mode: false
+      until: >-
+        (verify_ping.json['sonic-lab:output'] | default({})).get('success', false)
+        and verify_ping.json['sonic-lab:output'].received == verify_ping.json['sonic-lab:output'].transmitted
+      retries: 6
+      delay: 10
+      loop: "{{ verify.ping | default([]) }}"
+      loop_control:
+        label: "{{ item.destination }}{{ ' (source ' ~ item.source ~ ')' if item.source is defined else '' }}"

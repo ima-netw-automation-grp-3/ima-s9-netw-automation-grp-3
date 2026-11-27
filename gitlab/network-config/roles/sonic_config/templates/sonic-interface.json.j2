@@ -1,0 +1,11 @@
+{#- PUT du module sonic-interface : adresses IP des ports (« interfaces »), le reste est retiré. -#}
+{%- set ns = namespace(names=[], items=[], prefixes=[]) -%}
+{%- for itf in interfaces | default([]) -%}
+{%-   if itf.name not in ns.names -%}
+{%-     set ns.names = ns.names + [itf.name] -%}
+{%-     set ns.items = ns.items + [{"name": itf.name}] -%}
+{%-   endif -%}
+{%-   set ns.prefixes = ns.prefixes + [{"name": itf.name, "ip-prefix": itf.ip}] -%}
+{%- endfor -%}
+{%- set doc = {"INTERFACE": {"INTERFACE_LIST": ns.items, "INTERFACE_IPPREFIX_LIST": ns.prefixes}} if ns.items else {} -%}
+{{ {"sonic-interface:sonic-interface": doc} | to_nice_json(indent=2) }}

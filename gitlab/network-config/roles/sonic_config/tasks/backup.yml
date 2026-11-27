@@ -1,0 +1,34 @@
+---
+# État courant de chaque ressource que le déploiement va toucher, lu avant d'appliquer : manifeste
+# rollback/<routeur>/manifest.json (artefact du job deploy), remis en PUT par playbooks/rollback.yml.
+- name: Lire l'état courant de chaque ressource
+  ansible.builtin.uri:
+    url: "{{ restconf_url }}/data/{{ item }}"
+    url_username: "{{ restconf_user }}"
+    url_password: "{{ restconf_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ restconf_validate_certs }}"
+    headers:
+      Accept: application/yang-data+json
+    return_content: true
+    timeout: 60
+  register: sonic_config_backup
+  loop: "{{ sonic_config_payloads | map(attribute='path') | unique | list }}"
+
+# Artefacts du job, pas des changements du routeur : ni « changed » (le bilan ne compte que les
+# routeurs modifiés), ni diff (il afficherait toute la sauvegarde avec --diff).
+- name: Créer le dossier de sauvegarde
+  ansible.builtin.file:
+    path: "{{ sonic_config_rollback_dir }}"
+    state: directory
+    mode: "0755"
+  changed_when: false
+  diff: false
+
+- name: Écrire le manifeste de rollback
+  ansible.builtin.template:
+    src: rollback-manifest.json.j2
+    dest: "{{ sonic_config_rollback_dir }}/manifest.json"
+    mode: "0644"
+  changed_when: false
+  diff: false

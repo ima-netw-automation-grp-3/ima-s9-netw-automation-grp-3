@@ -1,0 +1,11 @@
+{#- PATCH du module sonic-port (fusion) : description, état et MTU des ports de « ports ».
+    Les autres champs des ports (lanes, vitesse, alias…) restent ceux du routeur. -#}
+{%- set ns = namespace(ports=[]) -%}
+{%- for p in ports | default([]) -%}
+{%-   set entry = {"name": p.name, "admin_status": p.admin_status | default(port_admin_status), "mtu": p.mtu | default(port_mtu) | int} -%}
+{%-   if p.description is defined -%}
+{%-     set entry = entry | combine({"description": p.description}) -%}
+{%-   endif -%}
+{%-   set ns.ports = ns.ports + [entry] -%}
+{%- endfor -%}
+{{ {"sonic-port:sonic-port": {"PORT": {"PORT_LIST": ns.ports}} if ns.ports else {}} | to_nice_json(indent=2) }}

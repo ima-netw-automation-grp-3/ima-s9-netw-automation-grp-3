@@ -1,0 +1,76 @@
+# CI/CD réseau du lab SONiC avec Ansible, par RESTCONF (voir README.md).
+#
+#   merge request / branche : lint → preview (--check --diff, validé par les routeurs) → verify
+#   branche par défaut      : lint → preview → deploy → verify → rollback (si une étape échoue)
+#
+# Les jobs tournent sur le runner du lab (tag sonic-lab), dans l'image sonic-lab-ansible construite par
+# docker compose (gitlab/ansible/ du projet du lab), sur le réseau de management : ils joignent le
+# RESTCONF des routeurs (https://172.20.30.11, .12). RESTCONF_USER, RESTCONF_PASSWORD et
+# FLOW_COLLECTOR_IP (collecteur sFlow) sont fournis par le runner.
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never # la merge request a déjà son pipeline
+    - if: $CI_COMMIT_BRANCH
+
+default:
+  image: $ANSIBLE_IMAGE
+  tags: [sonic-lab]
+
+variables:
+  ANSIBLE_IMAGE: sonic-lab-ansible:latest
+  # le dossier du job est accessible en écriture à tous : Ansible y ignorerait ansible.cfg
+  ANSIBLE_CONFIG: $CI_PROJECT_DIR/ansible.cfg
+  ANSIBLE_FORCE_COLOR: "1"
+  VERIFY_TIMEOUT: "180" # s : convergence BGP après un déploiement
+
+stages: [lint, preview, deploy, verify, rollback]
+
+lint:
+  stage: lint
+  interruptible: true
+  script:
+    - ansible-lint
+    - ansible-playbook playbooks/render.yml
+    - python3 -m pytest -q -p no:cacheprovider tests
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths: [build/] # documents rendus, à relire dans la merge request
+
+preview:
+  stage: preview
+  interruptible: true
+  script:
+    - ansible-playbook playbooks/deploy.yml --check --diff
+
+deploy:
+  stage: deploy
+  resource_group: sonic-lab # un seul déploiement à la fois sur le lab
+  environment:
+    name: lab
+  script:
+    - ansible-playbook playbooks/deploy.yml --diff
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths: [rollback/]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+verify:
+  stage: verify
+  resource_group: sonic-lab
+  script:
+    - ansible-playbook playbooks/verify.yml
+
+rollback:
+  stage: rollback
+  resource_group: sonic-lab
+  script:
+    - ansible-playbook playbooks/rollback.yml --diff
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_failure

@@ -1,0 +1,36 @@
+# Tests du dépôt : les étages « test » des Dockerfile (make test-docker : backend web, collecteur,
+# gitlab-sync, RESTCONF, agent GitOps, projet Ansible avec ansible-lint) et le typage du frontend.
+# Aucun lab n'est déployé : les tests utilisent de faux Docker, GitLab et routeurs.
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  docker:
+    name: make test-docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: make test-docker
+
+  frontend:
+    name: typage du frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web/frontend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck

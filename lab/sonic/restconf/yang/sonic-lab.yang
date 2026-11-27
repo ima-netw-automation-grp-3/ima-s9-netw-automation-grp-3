@@ -1,0 +1,234 @@
+module sonic-lab {
+  yang-version 1.1;
+  namespace "urn:sonic-lab:yang:sonic-lab";
+  prefix lab;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  organization
+    "Lab SONiC (containerlab)";
+  contact
+    "Voir le README du projet.";
+  description
+    "Extensions RESTCONF du lab SONiC, servies par le serveur RESTCONF du lab
+     (lab/sonic/restconf) avec les modèles sonic-* de SONiC :
+       - configuration FRR (vtysh) du routeur, sous forme de texte ;
+       - état des sessions BGP ;
+       - opération ping, lancée depuis le routeur ;
+       - opération preview : validation et différences d'une écriture RESTCONF,
+         sans l'appliquer.";
+
+  revision 2026-11-20 {
+    description
+      "Première version.";
+  }
+
+  container frr {
+    description
+      "Configuration et état de FRR.";
+    leaf running-config {
+      type string;
+      description
+        "Configuration FRR courante (show running-config), sans les lignes gérées
+         par SONiC lui-même. PUT : la configuration envoyée devient la référence
+         (replace par blocs de premier niveau : un bloc router bgp dont des lignes
+         disparaissent est recréé, ce qui réinitialise ses sessions). PATCH :
+         ajout et modification sans rien retirer (vtysh -f). La syntaxe est
+         vérifiée par vtysh -C avant toute application.";
+    }
+    container state {
+      config false;
+      description
+        "État opérationnel (show bgp summary json).";
+      list bgp-neighbor {
+        key "address";
+        description
+          "Session BGP, toutes familles d'adresses confondues.";
+        leaf address {
+          type inet:ip-address;
+          description
+            "Adresse du voisin.";
+        }
+        leaf remote-as {
+          type uint32;
+          description
+            "AS du voisin.";
+        }
+        leaf state {
+          type string;
+          description
+            "État de la session (Established, Active, Idle...).";
+        }
+        leaf description {
+          type string;
+          description
+            "Description du voisin (neighbor X description).";
+        }
+        leaf uptime {
+          type string;
+          description
+            "Durée depuis le dernier changement d'état.";
+        }
+        leaf prefixes-received {
+          type uint32;
+          description
+            "Préfixes reçus du voisin.";
+        }
+      }
+    }
+  }
+
+  rpc ping {
+    description
+      "Ping lancé depuis le routeur.";
+    input {
+      leaf destination {
+        type string {
+          length "1..253";
+        }
+        mandatory true;
+        description
+          "Adresse IP ou nom d'hôte.";
+      }
+      leaf source {
+        type string {
+          length "1..63";
+        }
+        description
+          "Adresse ou interface source (ping -I).";
+      }
+      leaf count {
+        type uint8 {
+          range "1..20";
+        }
+        default "3";
+        description
+          "Nombre de paquets.";
+      }
+    }
+    output {
+      leaf transmitted {
+        type uint32;
+        description
+          "Paquets envoyés.";
+      }
+      leaf received {
+        type uint32;
+        description
+          "Réponses reçues.";
+      }
+      leaf loss-percent {
+        type decimal64 {
+          fraction-digits 1;
+          range "0..100";
+        }
+        description
+          "Pertes, en pourcentage.";
+      }
+      leaf rtt-min {
+        type decimal64 {
+          fraction-digits 3;
+        }
+        units "milliseconds";
+        description
+          "Aller-retour minimal.";
+      }
+      leaf rtt-avg {
+        type decimal64 {
+          fraction-digits 3;
+        }
+        units "milliseconds";
+        description
+          "Aller-retour moyen.";
+      }
+      leaf rtt-max {
+        type decimal64 {
+          fraction-digits 3;
+        }
+        units "milliseconds";
+        description
+          "Aller-retour maximal.";
+      }
+      leaf success {
+        type boolean;
+        description
+          "Au moins une réponse reçue.";
+      }
+      leaf output {
+        type string;
+        description
+          "Sortie brute de ping.";
+      }
+    }
+  }
+
+  rpc preview {
+    description
+      "Aperçu d'une écriture RESTCONF (PUT, PATCH, POST, DELETE) : validation par
+       les modèles YANG puis par GCU en simulation (config apply-patch --dry-run)
+       pour les données sonic-*, par vtysh -C pour la configuration FRR. Rien
+       n'est appliqué.";
+    input {
+      leaf path {
+        type string;
+        mandatory true;
+        description
+          "Chemin de la ressource, avec ou sans le préfixe /restconf/data/
+           (ex. sonic-port:sonic-port/PORT/PORT_LIST=Ethernet0).";
+      }
+      leaf method {
+        type enumeration {
+          enum PUT;
+          enum PATCH;
+          enum POST;
+          enum DELETE;
+        }
+        mandatory true;
+        description
+          "Méthode simulée.";
+      }
+      anydata data {
+        description
+          "Corps de la requête simulée (absent pour DELETE).";
+      }
+    }
+    output {
+      leaf valid {
+        type boolean;
+        description
+          "L'écriture serait acceptée.";
+      }
+      leaf errors {
+        type string;
+        description
+          "Raison du refus.";
+      }
+      leaf diff {
+        type string;
+        description
+          "Différences avant/après (JSON pour les données sonic-*, texte vtysh
+           pour FRR).";
+      }
+      leaf patch {
+        type string;
+        description
+          "Données sonic-* : JSON Patch (RFC 6902) que GCU appliquerait à la
+           CONFIG_DB.";
+      }
+      leaf commands {
+        type string;
+        description
+          "FRR en replace : commandes de retrait exécutées avant la
+           configuration envoyée.";
+      }
+      leaf-list resets {
+        type string;
+        description
+          "FRR en replace : blocs supprimés puis recréés (sessions
+           réinitialisées).";
+      }
+    }
+  }
+}

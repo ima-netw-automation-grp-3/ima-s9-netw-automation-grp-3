@@ -1,0 +1,11 @@
+---
+# ansible-lint (job lint) : règles du profil production, sans accès réseau.
+profile: production
+offline: true
+exclude_paths:
+  - build/
+  - rollback/
+  - tests/
+  - .ansible/
+  - .cache/
+  - .gitlab-ci.yml

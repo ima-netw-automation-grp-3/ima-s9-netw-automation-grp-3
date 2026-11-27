@@ -1,0 +1,7 @@
+{#- Manifeste de rollback : l'état lu avant le déploiement, une entrée par ressource, remise en PUT
+    dans l'ordre du déploiement (CONFIG_DB, puis FRR). -#}
+{%- set ns = namespace(docs=[]) -%}
+{%- for r in sonic_config_backup.results -%}
+{%-   set ns.docs = ns.docs + [{"name": r.item, "path": r.item, "method": "put", "content": r.json}] -%}
+{%- endfor -%}
+{{ ns.docs | to_nice_json(indent=2) }}

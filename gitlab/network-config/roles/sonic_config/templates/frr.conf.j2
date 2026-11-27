@@ -1,0 +1,20 @@
+{#- PUT de la conf FRR (sonic-lab:frr/running-config) : le routeur la remplace bloc par bloc, et un bloc
+    « router bgp » modifié est recréé (sessions réinitialisées). Même ordre que la running de FRR, pour
+    que le preview ne voie aucune différence quand rien ne change. -#}
+router bgp {{ bgp.asn }}
+ bgp router-id {{ bgp.router_id }}
+ bgp log-neighbor-changes
+ no bgp ebgp-requires-policy
+{% for n in bgp.neighbors | default([]) %}
+ neighbor {{ n.address }} remote-as {{ n.remote_as }}
+{% if n.description is defined %}
+ neighbor {{ n.address }} description {{ n.description }}
+{% endif %}
+{% endfor %}
+ address-family ipv4 unicast
+{% for net in bgp.networks | default([]) %}
+  network {{ net }}
+{% endfor %}
+ exit-address-family
+exit
+!

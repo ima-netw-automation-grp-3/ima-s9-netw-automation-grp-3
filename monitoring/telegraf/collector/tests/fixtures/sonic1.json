@@ -1,0 +1,2292 @@
+{
+ "addresses": {
+  "Bridge": [
+   {
+    "address": "fe80::8f6:9cff:fe28:64c1",
+    "family": "inet6",
+    "prefixlen": 64,
+    "scope": "link"
+   }
+  ],
+  "Ethernet0": [
+   {
+    "address": "192.168.1.1",
+    "family": "inet",
+    "prefixlen": 24,
+    "scope": "global"
+   },
+   {
+    "address": "fe80::8f6:9cff:fe28:64c1",
+    "family": "inet6",
+    "prefixlen": 64,
+    "scope": "link"
+   }
+  ],
+  "Ethernet4": [
+   {
+    "address": "10.0.12.1",
+    "family": "inet",
+    "prefixlen": 30,
+    "scope": "global"
+   },
+   {
+    "address": "fe80::8f6:9cff:fe28:64c1",
+    "family": "inet6",
+    "prefixlen": 64,
+    "scope": "link"
+   }
+  ],
+  "Ethernet8": [],
+  "Loopback0": [
+   {
+    "address": "10.255.0.1",
+    "family": "inet",
+    "prefixlen": 32,
+    "scope": "global"
+   },
+   {
+    "address": "fe80::749c:1ff:fe13:6374",
+    "family": "inet6",
+    "prefixlen": 64,
+    "scope": "link"
+   }
+  ],
+  "dummy": [
+   {
+    "address": "fe80::30ee:fdff:fe69:592e",
+    "family": "inet6",
+    "prefixlen": 64,
+    "scope": "link"
+   }
+  ],
+  "eth0": [
+   {
+    "address": "172.20.30.11",
+    "family": "inet",
+    "prefixlen": 24,
+    "scope": "global"
+   }
+  ],
+  "eth1": [],
+  "eth2": [],
+  "lo": [
+   {
+    "address": "127.0.0.1",
+    "family": "inet",
+    "prefixlen": 8,
+    "scope": "host"
+   },
+   {
+    "address": "::1",
+    "family": "inet6",
+    "prefixlen": 128,
+    "scope": "host"
+   }
+  ]
+ },
+ "bgp": {
+  "neighbors": {
+   "default": {
+    "10.0.12.2": {
+     "addressFamilyInfo": {
+      "ipv4Unicast": {
+       "acceptedPrefixCounter": 2,
+       "commAttriSentToNbr": "standardAndextendedAndlarge",
+       "packetQueueLength": 0,
+       "receivedPrefixDup": 0,
+       "sentPrefixCounter": 4,
+       "subGroupId": 1,
+       "updateGroupId": 1
+      }
+     },
+     "bgpConnection": "sharedNetwork",
+     "bgpInUpdateElapsedTimeMsecs": 2596000,
+     "bgpState": "Established",
+     "bgpTcpMssConfigured": 0,
+     "bgpTcpMssSynced": 9048,
+     "bgpTimerConfiguredConditionalAdvertisementsSec": 60,
+     "bgpTimerConfiguredHoldTimeMsecs": 180000,
+     "bgpTimerConfiguredKeepAliveIntervalMsecs": 60000,
+     "bgpTimerHoldTimeMsecs": 180000,
+     "bgpTimerKeepAliveIntervalMsecs": 60000,
+     "bgpTimerLastRead": 17000,
+     "bgpTimerLastWrite": 17000,
+     "bgpTimerUpEstablishedEpoch": 1795093627,
+     "bgpTimerUpMsec": 2597000,
+     "bgpTimerUpString": "00:43:17",
+     "bgpUpdateDelayTimerMsecs": 0,
+     "bgpUpdateDelayTimerMsecsRemaining": 0,
+     "bgpVersion": 4,
+     "connectRetryTimer": 30,
+     "connectionsDropped": 0,
+     "connectionsEstablished": 1,
+     "estimatedRttInMsecs": 0,
+     "extendedOptionalParametersLength": false,
+     "externalBgpNbrMaxHopsAway": 1,
+     "gracefulRestartInfo": {
+      "endOfRibRecv": {
+       "ipv4Unicast": true
+      },
+      "endOfRibSend": {
+       "ipv4Unicast": true
+      },
+      "ipv4Unicast": {
+       "endOfRibStatus": {
+        "endOfRibRecv": true,
+        "endOfRibSend": true,
+        "endOfRibSentAfterUpdate": true
+       },
+       "fBit": false,
+       "timers": {
+        "llgrStaleTime": 0,
+        "stalePathTimer": 360
+       }
+      },
+      "localGrMode": "Helper*",
+      "nBit": true,
+      "rBit": true,
+      "remoteGrMode": "Helper",
+      "timers": {
+       "configuredLlgrStaleTime": 0,
+       "configuredRestartTimer": 120,
+       "receivedRestartTimer": 120
+      }
+     },
+     "hostForeign": "10.0.12.2",
+     "hostLocal": "10.0.12.1",
+     "hostname": "sonic2",
+     "lastResetCode": 27,
+     "lastResetDueTo": "No path to specified Neighbor",
+     "lastResetTimerMsecs": 2601000,
+     "localAs": 65001,
+     "localAsReplaceAsDualAs": false,
+     "localRole": "undefined",
+     "localRouterId": "10.255.0.1",
+     "messageStats": {
+      "capabilityRecv": 0,
+      "capabilitySent": 0,
+      "depthInq": 0,
+      "depthOutq": 0,
+      "keepalivesRecv": 44,
+      "keepalivesSent": 44,
+      "notificationsRecv": 0,
+      "notificationsSent": 0,
+      "opensRecv": 1,
+      "opensSent": 2,
+      "routeRefreshRecv": 0,
+      "routeRefreshSent": 0,
+      "totalRecv": 48,
+      "totalSent": 49,
+      "updatesRecv": 3,
+      "updatesSent": 3
+     },
+     "minBtwnAdvertisementRunsTimerMsecs": 0,
+     "nbrDesc": "sonic2",
+     "nbrExternalLink": true,
+     "neighborAddr": "10.0.12.2",
+     "neighborCapabilities": {
+      "4byteAs": "advertisedAndReceived",
+      "addPath": {
+       "ipv4Unicast": {
+        "rxAdvertised": true,
+        "rxAdvertisedAndReceived": true,
+        "rxReceived": true
+       }
+      },
+      "addressFamiliesByPeer": "none",
+      "enhancedRouteRefresh": "advertisedAndReceived",
+      "extendedMessage": "advertisedAndReceived",
+      "gracefulRestart": "advertisedAndReceived",
+      "gracefulRestartRemoteTimerSec": 120,
+      "hostName": {
+       "advDomainName": "n/a",
+       "advHostName": "sonic1",
+       "rcvDomainName": "n/a",
+       "rcvHostName": "sonic2"
+      },
+      "linkLocalNextHop": {
+       "advertised": false,
+       "received": false
+      },
+      "longLivedGracefulRestart": "advertisedAndReceived",
+      "longLivedGracefulRestartByPeer": {},
+      "multiprotocolExtensions": {
+       "ipv4Unicast": {
+        "advertisedAndReceived": true
+       }
+      },
+      "nBitReceived": true,
+      "pathsLimit": {
+       "ipv4Unicast": {
+        "advertisedAndReceived": true,
+        "advertisedPathsLimit": 0,
+        "receivedPathsLimit": 0
+       }
+      },
+      "rBitReceived": true,
+      "routeRefresh": "advertisedAndReceived",
+      "softwareVersion": {}
+     },
+     "nexthop": "10.0.12.1",
+     "nexthopGlobal": "fe80::8f6:9cff:fe28:64c1",
+     "nexthopLocal": "fe80::8f6:9cff:fe28:64c1",
+     "portForeign": 37260,
+     "portLocal": 179,
+     "prefixStats": {
+      "aspathLoop": 2,
+      "attributesDiscarded": 0,
+      "clusterLoop": 0,
+      "inboundFiltered": 0,
+      "invalidNextHop": 0,
+      "originatorLoop": 0,
+      "withdrawn": 0
+     },
+     "readThread": "on",
+     "remoteAs": 65002,
+     "remoteRole": "undefined",
+     "remoteRouterId": "10.255.0.2",
+     "softwareVersion": "n/a",
+     "writeThread": "on"
+    },
+    "vrfId": 0,
+    "vrfName": "default"
+   }
+  },
+  "summary": {
+   "default": {
+    "ipv4Unicast": {
+     "as": 65001,
+     "bestPath": {
+      "multiPathRelax": "false"
+     },
+     "displayedPeers": 1,
+     "dynamicPeers": 0,
+     "failedPeers": 0,
+     "peerCount": 1,
+     "peerMemory": 30696,
+     "peers": {
+      "10.0.12.2": {
+       "connectionsDropped": 0,
+       "connectionsEstablished": 1,
+       "desc": "sonic2",
+       "hostname": "sonic2",
+       "idType": "ipv4",
+       "inq": 0,
+       "localAs": 65001,
+       "msgRcvd": 48,
+       "msgSent": 49,
+       "outq": 0,
+       "peerState": "OK",
+       "peerUptime": "00:43:17",
+       "peerUptimeEstablishedEpoch": 1795093627,
+       "peerUptimeMsec": 2597000,
+       "pfxRcd": 2,
+       "pfxSnt": 4,
+       "remoteAs": 65002,
+       "softwareVersion": "n/a",
+       "state": "Established",
+       "tableVersion": 4,
+       "version": 4
+      }
+     },
+     "ribCount": 4,
+     "ribMemory": 640,
+     "routerId": "10.255.0.1",
+     "tableVersion": 4,
+     "totalPeers": 1,
+     "vrfId": 0,
+     "vrfName": "default"
+    }
+   }
+  }
+ },
+ "counters": {
+  "crm": {
+   "ACL_STATS:EGRESS:LAG": {
+    "crm_stats_acl_group_available": "200",
+    "crm_stats_acl_group_used": "0",
+    "crm_stats_acl_table_available": "3",
+    "crm_stats_acl_table_used": "0"
+   },
+   "ACL_STATS:EGRESS:PORT": {
+    "crm_stats_acl_group_available": "200",
+    "crm_stats_acl_group_used": "0",
+    "crm_stats_acl_table_available": "3",
+    "crm_stats_acl_table_used": "0"
+   },
+   "ACL_STATS:EGRESS:RIF": {
+    "crm_stats_acl_group_available": "200",
+    "crm_stats_acl_group_used": "0",
+    "crm_stats_acl_table_available": "3",
+    "crm_stats_acl_table_used": "0"
+   },
+   "ACL_STATS:EGRESS:SWITCH": {
+    "crm_stats_acl_group_available": "200",
+    "crm_stats_acl_group_used": "0",
+    "crm_stats_acl_table_available": "3",
+    "crm_stats_acl_table_used": "0"
+   },
+   "ACL_STATS:EGRESS:VLAN": {
+    "crm_stats_acl_group_available": "200",
+    "crm_stats_acl_group_used": "0",
+    "crm_stats_acl_table_available": "3",
+    "crm_stats_acl_table_used": "0"
+   },
+   "ACL_STATS:INGRESS:LAG": {
+    "crm_stats_acl_group_available": "200",
+    "crm_stats_acl_group_used": "0",
+    "crm_stats_acl_table_available": "3",
+    "crm_stats_acl_table_used": "0"
+   },
+   "ACL_STATS:INGRESS:PORT": {
+    "crm_stats_acl_group_available": "200",
+    "crm_stats_acl_group_used": "0",
+    "crm_stats_acl_table_available": "3",
+    "crm_stats_acl_table_used": "0"
+   },
+   "ACL_STATS:INGRESS:RIF": {
+    "crm_stats_acl_group_available": "200",
+    "crm_stats_acl_group_used": "0",
+    "crm_stats_acl_table_available": "3",
+    "crm_stats_acl_table_used": "0"
+   },
+   "ACL_STATS:INGRESS:SWITCH": {
+    "crm_stats_acl_group_available": "200",
+    "crm_stats_acl_group_used": "0",
+    "crm_stats_acl_table_available": "3",
+    "crm_stats_acl_table_used": "1"
+   },
+   "ACL_STATS:INGRESS:VLAN": {
+    "crm_stats_acl_group_available": "200",
+    "crm_stats_acl_group_used": "0",
+    "crm_stats_acl_table_available": "3",
+    "crm_stats_acl_table_used": "0"
+   },
+   "STATS": {
+    "crm_stats_dnat_entry_available": "100",
+    "crm_stats_dnat_entry_used": "0",
+    "crm_stats_fdb_entry_available": "800",
+    "crm_stats_fdb_entry_used": "0",
+    "crm_stats_ipmc_entry_available": "100",
+    "crm_stats_ipmc_entry_used": "0",
+    "crm_stats_ipv4_neighbor_available": "4000",
+    "crm_stats_ipv4_neighbor_used": "2",
+    "crm_stats_ipv4_nexthop_available": "32000",
+    "crm_stats_ipv4_nexthop_used": "2",
+    "crm_stats_ipv4_route_available": "100000",
+    "crm_stats_ipv4_route_used": "8",
+    "crm_stats_ipv6_neighbor_available": "2000",
+    "crm_stats_ipv6_neighbor_used": "0",
+    "crm_stats_ipv6_nexthop_available": "32000",
+    "crm_stats_ipv6_nexthop_used": "0",
+    "crm_stats_ipv6_route_available": "10000",
+    "crm_stats_ipv6_route_used": "3",
+    "crm_stats_mpls_inseg_available": "1000",
+    "crm_stats_mpls_inseg_used": "0",
+    "crm_stats_mpls_nexthop_available": "1000",
+    "crm_stats_mpls_nexthop_used": "0",
+    "crm_stats_nexthop_group_available": "400",
+    "crm_stats_nexthop_group_map_available": "512",
+    "crm_stats_nexthop_group_map_used": "0",
+    "crm_stats_nexthop_group_member_available": "16000",
+    "crm_stats_nexthop_group_member_used": "0",
+    "crm_stats_nexthop_group_used": "0",
+    "crm_stats_snat_entry_available": "100",
+    "crm_stats_snat_entry_used": "0",
+    "crm_stats_srv6_my_sid_entry_available": "0",
+    "crm_stats_srv6_my_sid_entry_used": "0"
+   }
+  },
+  "objects": [
+   {
+    "object": "Values",
+    "source": "COUNTERS_GLOBAL_NAT",
+    "type": "Values",
+    "values": {
+     "MAX_NAT_ENTRIES": "100",
+     "TCP_TIMEOUT": "86400",
+     "TIMEOUT": "600",
+     "UDP_TIMEOUT": "300"
+    }
+   },
+   {
+    "object": "bfd_session_state_change",
+    "source": "NOTIFICATION_CONSUMER_STATS",
+    "type": "BfdOrch",
+    "values": {
+     "admit_ratio_pct": "0",
+     "admitted": "0",
+     "dropped_allowlist": "6",
+     "received": "6"
+    }
+   },
+   {
+    "object": "fdb_event",
+    "source": "NOTIFICATION_CONSUMER_STATS",
+    "type": "FdbOrch",
+    "values": {
+     "admit_ratio_pct": "0",
+     "admitted": "0",
+     "dropped_allowlist": "6",
+     "lru_current_depth": "0",
+     "lru_dedup_hits": "0",
+     "lru_dedup_ratio_pct": "0",
+     "lru_high_watermark": "0",
+     "lru_pushed": "0",
+     "received": "6"
+    }
+   },
+   {
+    "object": "flush",
+    "source": "NOTIFICATION_CONSUMER_STATS",
+    "type": "FdbOrch",
+    "values": {
+     "admit_ratio_pct": "0",
+     "admitted": "0",
+     "dropped_allowlist": "0",
+     "received": "0"
+    }
+   },
+   {
+    "object": "icmp_echo_session_state_change",
+    "source": "NOTIFICATION_CONSUMER_STATS",
+    "type": "IcmpOrch",
+    "values": {
+     "admit_ratio_pct": "0",
+     "admitted": "0",
+     "dropped_allowlist": "6",
+     "received": "6"
+    }
+   },
+   {
+    "object": "port_host_tx_ready",
+    "source": "NOTIFICATION_CONSUMER_STATS",
+    "type": "PortsOrch",
+    "values": {
+     "admit_ratio_pct": "0",
+     "admitted": "0",
+     "dropped_allowlist": "6",
+     "lru_current_depth": "0",
+     "lru_dedup_hits": "0",
+     "lru_dedup_ratio_pct": "0",
+     "lru_high_watermark": "0",
+     "lru_pushed": "0",
+     "received": "6"
+    }
+   },
+   {
+    "object": "port_state_change",
+    "source": "NOTIFICATION_CONSUMER_STATS",
+    "type": "PortsOrch",
+    "values": {
+     "admit_ratio_pct": "100",
+     "admitted": "6",
+     "dropped_allowlist": "0",
+     "lru_current_depth": "0",
+     "lru_dedup_hits": "0",
+     "lru_dedup_ratio_pct": "0",
+     "lru_high_watermark": "6",
+     "lru_pushed": "6",
+     "received": "6"
+    }
+   }
+  ],
+  "truncated": false
+ },
+ "db": {
+  "APPL_DB": {
+   "BUFFER_PG_TABLE": 32,
+   "BUFFER_POOL_TABLE": 3,
+   "BUFFER_PROFILE_TABLE": 3,
+   "BUFFER_QUEUE_TABLE": 96,
+   "COPP_TABLE": 8,
+   "INTF_TABLE": 6,
+   "LLDP_ENTRY_TABLE": 1,
+   "LLDP_LOC_CHASSIS": 1,
+   "NEIGH_TABLE": 3,
+   "PORT_TABLE": 34,
+   "ROUTE_TABLE": 6
+  },
+  "ASIC_DB": {
+   "ASIC_STATE:SAI_OBJECT_TYPE_ACL_TABLE": 1,
+   "ASIC_STATE:SAI_OBJECT_TYPE_BRIDGE": 1,
+   "ASIC_STATE:SAI_OBJECT_TYPE_BUFFER_POOL": 3,
+   "ASIC_STATE:SAI_OBJECT_TYPE_BUFFER_PROFILE": 3,
+   "ASIC_STATE:SAI_OBJECT_TYPE_DTEL": 1,
+   "ASIC_STATE:SAI_OBJECT_TYPE_HASH": 2,
+   "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF": 3,
+   "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_TABLE_ENTRY": 2,
+   "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_TRAP": 16,
+   "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_TRAP_GROUP": 8,
+   "ASIC_STATE:SAI_OBJECT_TYPE_HOSTIF_USER_DEFINED_TRAP": 1,
+   "ASIC_STATE:SAI_OBJECT_TYPE_INGRESS_PRIORITY_GROUP": 256,
+   "ASIC_STATE:SAI_OBJECT_TYPE_NEIGHBOR_ENTRY": 2,
+   "ASIC_STATE:SAI_OBJECT_TYPE_NEXT_HOP": 2,
+   "ASIC_STATE:SAI_OBJECT_TYPE_POLICER": 8,
+   "ASIC_STATE:SAI_OBJECT_TYPE_PORT": 33,
+   "ASIC_STATE:SAI_OBJECT_TYPE_PORT_SERDES": 32,
+   "ASIC_STATE:SAI_OBJECT_TYPE_QOS_MAP": 4,
+   "ASIC_STATE:SAI_OBJECT_TYPE_QUEUE": 672,
+   "ASIC_STATE:SAI_OBJECT_TYPE_ROUTER_INTERFACE": 3,
+   "ASIC_STATE:SAI_OBJECT_TYPE_ROUTE_ENTRY": 11,
+   "ASIC_STATE:SAI_OBJECT_TYPE_SCHEDULER": 2,
+   "ASIC_STATE:SAI_OBJECT_TYPE_SCHEDULER_GROUP": 416,
+   "ASIC_STATE:SAI_OBJECT_TYPE_STP": 1,
+   "ASIC_STATE:SAI_OBJECT_TYPE_SWITCH": 1,
+   "ASIC_STATE:SAI_OBJECT_TYPE_TAM": 1,
+   "ASIC_STATE:SAI_OBJECT_TYPE_TAM_COLLECTOR": 1,
+   "ASIC_STATE:SAI_OBJECT_TYPE_TAM_TRANSPORT": 1,
+   "ASIC_STATE:SAI_OBJECT_TYPE_VIRTUAL_ROUTER": 1,
+   "ASIC_STATE:SAI_OBJECT_TYPE_VLAN": 1,
+   "ASIC_STATE:SAI_OBJECT_TYPE_WRED": 1,
+   "COLDVIDS": 1,
+   "HIDDEN": 1,
+   "LANES": 1,
+   "RIDTOVID": 1,
+   "VIDCOUNTER": 1,
+   "VIDTORID": 1
+  },
+  "CONFIG_DB": {
+   "BREAKOUT_CFG": 32,
+   "BUFFER_PG": 32,
+   "BUFFER_POOL": 3,
+   "BUFFER_PROFILE": 3,
+   "BUFFER_QUEUE": 96,
+   "CABLE_LENGTH": 1,
+   "CONFIG_DB_INITIALIZED": 1,
+   "DEVICE_METADATA": 1,
+   "DSCP_TO_TC_MAP": 1,
+   "FEATURE": 9,
+   "INTERFACE": 4,
+   "LOGGER": 101,
+   "LOOPBACK_INTERFACE": 2,
+   "MAP_PFC_PRIORITY_TO_QUEUE": 1,
+   "PORT": 32,
+   "PORT_QOS_MAP": 1,
+   "SCHEDULER": 2,
+   "TC_TO_PRIORITY_GROUP_MAP": 1,
+   "TC_TO_QUEUE_MAP": 1,
+   "WRED_PROFILE": 1
+  },
+  "COUNTERS_DB": {
+   "COUNTERS_BUFFER_POOL_NAME_MAP": 1,
+   "COUNTERS_GLOBAL_NAT": 1,
+   "COUNTERS_LAG_NAME_MAP": 1,
+   "COUNTERS_PORT_NAME_MAP": 1,
+   "COUNTERS_PORT_SERDES_ID_TO_PORT_ID_MAP": 1,
+   "COUNTERS_QUEUE_INDEX_MAP": 1,
+   "COUNTERS_QUEUE_NAME_MAP": 1,
+   "COUNTERS_QUEUE_PORT_MAP": 1,
+   "COUNTERS_QUEUE_TYPE_MAP": 1,
+   "CRM": 11,
+   "NOTIFICATION_CONSUMER_STATS": 6
+  },
+  "FLEX_COUNTER_DB": {
+   "FLEX_COUNTER_GROUP_TABLE": 26
+  },
+  "STATE_DB": {
+   "ACL_STAGE_CAPABILITY_TABLE": 2,
+   "ASIC_TEMPERATURE_INFO": 1,
+   "BUFFER_MAX_PARAM_TABLE": 32,
+   "COPP_GROUP_TABLE": 8,
+   "COPP_TRAP_CAPABILITY_TABLE": 1,
+   "COPP_TRAP_TABLE": 20,
+   "DEBUG_COUNTER_CAPABILITIES": 4,
+   "FDB_SYNC": 1,
+   "FIPS_MACSEC_POST_TABLE": 1,
+   "FLOW_COUNTER_CAPABILITY_TABLE": 1,
+   "INTERFACE_TABLE": 6,
+   "MMG_CAPABILITY_TABLE": 1,
+   "NEIGH_STATE_TABLE": 1,
+   "PBH_CAPABILITIES": 4,
+   "PORT_COUNTER_CAPABILITIES": 4,
+   "PORT_OPERR_TABLE": 1,
+   "PORT_TABLE": 32,
+   "PROCESS_HEALTH": 1,
+   "QUEUE_COUNTER_CAPABILITIES": 4,
+   "ROUTE_TABLE": 2,
+   "SWITCH_CAPABILITY": 1,
+   "WARM_RESTART_TABLE": 16
+  }
+ },
+ "duration": 0.14749550819396973,
+ "errors": {},
+ "lldp": {
+  "eth0": {
+   "lldp_rem_chassis_id": "a6:3e:d7:22:aa:38",
+   "lldp_rem_chassis_id_subtype": "4",
+   "lldp_rem_index": "1",
+   "lldp_rem_man_addr": "172.20.30.12",
+   "lldp_rem_port_desc": "eth0",
+   "lldp_rem_port_id": "a6:3e:d7:22:aa:38",
+   "lldp_rem_port_id_subtype": "3",
+   "lldp_rem_sys_cap_enabled": "08 00",
+   "lldp_rem_sys_cap_supported": "28 00",
+   "lldp_rem_sys_desc": "Debian GNU/Linux 12 (bookworm) Linux 7.2.15-1-omarchy #1 SMP PREEMPT_DYNAMIC Mon, 02 Nov 2026 10:32:17 +0000 x86_64",
+   "lldp_rem_sys_name": "sonic2",
+   "lldp_rem_time_mark": "1"
+  }
+ },
+ "meta": {
+  "device": {
+   "buffer_model": "traditional",
+   "hostname": "sonic1",
+   "hwsku": "Force10-S6000",
+   "mac": "0a:f6:9c:28:64:c1",
+   "platform": "x86_64-kvm_x86_64-r0",
+   "switch_type": "switch"
+  },
+  "frr": "FRRouting 10.7.1",
+  "frr_daemons": [
+   "mgmtd",
+   "zebra",
+   "bgpd",
+   "staticd"
+  ],
+  "hostname": "sonic1",
+  "kernel": "7.2.15-1-omarchy",
+  "ready": true,
+  "version": {
+   "asic_type": "vs",
+   "branch": "master",
+   "build_date": "Wed Nov 18 17:11:35 UTC 2026",
+   "build_number": "1280150",
+   "build_version": "master.1280150-71d15c250",
+   "built_by": "azureuser@70254e43c000000",
+   "commit_id": "71d15c250",
+   "debian_version": "12.15",
+   "kernel_version": "7.2.15-1-omarchy",
+   "release": "none",
+   "secure_boot_image": "no",
+   "sonic_os_version": "13"
+  }
+ },
+ "neighbors": [
+  {
+   "dev": "Ethernet0",
+   "dst": "192.168.1.10",
+   "lladdr": "aa:c1:ab:c3:10:a0",
+   "state": [
+    "REACHABLE"
+   ]
+  },
+  {
+   "dev": "eth0",
+   "dst": "172.20.30.1",
+   "lladdr": "8a:e0:cf:bc:35:5c",
+   "state": [
+    "STALE"
+   ]
+  },
+  {
+   "dev": "Ethernet4",
+   "dst": "10.0.12.2",
+   "lladdr": "a6:3e:d7:22:aa:38",
+   "state": [
+    "REACHABLE"
+   ]
+  },
+  {
+   "dev": "Ethernet0",
+   "dst": "fe80::a8c1:abff:fec3:10a0",
+   "lladdr": "aa:c1:ab:c3:10:a0",
+   "state": [
+    "STALE"
+   ]
+  }
+ ],
+ "netdev": {
+  "Bridge": {
+   "address": "0a:f6:9c:28:64:c1",
+   "carrier": 1,
+   "flags": 4099,
+   "mtu": 9100,
+   "operstate": "up",
+   "speed": -1,
+   "stats": {
+    "collisions": 0,
+    "multicast": 0,
+    "rx_bytes": 0,
+    "rx_compressed": 0,
+    "rx_crc_errors": 0,
+    "rx_dropped": 0,
+    "rx_errors": 0,
+    "rx_fifo_errors": 0,
+    "rx_frame_errors": 0,
+    "rx_length_errors": 0,
+    "rx_missed_errors": 0,
+    "rx_nohandler": 0,
+    "rx_over_errors": 0,
+    "rx_packets": 0,
+    "tx_aborted_errors": 0,
+    "tx_bytes": 1288,
+    "tx_carrier_errors": 0,
+    "tx_compressed": 0,
+    "tx_dropped": 0,
+    "tx_errors": 0,
+    "tx_fifo_errors": 0,
+    "tx_heartbeat_errors": 0,
+    "tx_packets": 12,
+    "tx_window_errors": 0
+   }
+  },
+  "Ethernet0": {
+   "address": "0a:f6:9c:28:64:c1",
+   "carrier": 1,
+   "flags": 4099,
+   "mtu": 9100,
+   "operstate": "unknown",
+   "speed": 10000,
+   "stats": {
+    "collisions": 0,
+    "multicast": 0,
+    "rx_bytes": 18588,
+    "rx_compressed": 0,
+    "rx_crc_errors": 0,
+    "rx_dropped": 8,
+    "rx_errors": 0,
+    "rx_fifo_errors": 0,
+    "rx_frame_errors": 0,
+    "rx_length_errors": 0,
+    "rx_missed_errors": 0,
+    "rx_nohandler": 0,
+    "rx_over_errors": 0,
+    "rx_packets": 199,
+    "tx_aborted_errors": 0,
+    "tx_bytes": 39242,
+    "tx_carrier_errors": 0,
+    "tx_compressed": 0,
+    "tx_dropped": 0,
+    "tx_errors": 0,
+    "tx_fifo_errors": 0,
+    "tx_heartbeat_errors": 0,
+    "tx_packets": 278,
+    "tx_window_errors": 0
+   }
+  },
+  "Ethernet4": {
+   "address": "0a:f6:9c:28:64:c1",
+   "carrier": 1,
+   "flags": 4099,
+   "mtu": 9100,
+   "operstate": "unknown",
+   "speed": 10000,
+   "stats": {
+    "collisions": 0,
+    "multicast": 0,
+    "rx_bytes": 59469,
+    "rx_compressed": 0,
+    "rx_crc_errors": 0,
+    "rx_dropped": 4,
+    "rx_errors": 0,
+    "rx_fifo_errors": 0,
+    "rx_frame_errors": 0,
+    "rx_length_errors": 0,
+    "rx_missed_errors": 0,
+    "rx_nohandler": 0,
+    "rx_over_errors": 0,
+    "rx_packets": 549,
+    "tx_aborted_errors": 0,
+    "tx_bytes": 57086,
+    "tx_carrier_errors": 0,
+    "tx_compressed": 0,
+    "tx_dropped": 0,
+    "tx_errors": 0,
+    "tx_fifo_errors": 0,
+    "tx_heartbeat_errors": 0,
+    "tx_packets": 512,
+    "tx_window_errors": 0
+   }
+  },
+  "Ethernet8": {
+   "address": "0a:f6:9c:28:64:c1",
+   "carrier": null,
+   "flags": 4098,
+   "mtu": 9100,
+   "operstate": "down",
+   "speed": null,
+   "stats": {
+    "collisions": 0,
+    "multicast": 0,
+    "rx_bytes": 0,
+    "rx_compressed": 0,
+    "rx_crc_errors": 0,
+    "rx_dropped": 0,
+    "rx_errors": 0,
+    "rx_fifo_errors": 0,
+    "rx_frame_errors": 0,
+    "rx_length_errors": 0,
+    "rx_missed_errors": 0,
+    "rx_nohandler": 0,
+    "rx_over_errors": 0,
+    "rx_packets": 0,
+    "tx_aborted_errors": 0,
+    "tx_bytes": 0,
+    "tx_carrier_errors": 0,
+    "tx_compressed": 0,
+    "tx_dropped": 0,
+    "tx_errors": 0,
+    "tx_fifo_errors": 0,
+    "tx_heartbeat_errors": 0,
+    "tx_packets": 0,
+    "tx_window_errors": 0
+   }
+  },
+  "Loopback0": {
+   "address": "76:9c:01:13:63:74",
+   "carrier": 1,
+   "flags": 131,
+   "mtu": 65536,
+   "operstate": "unknown",
+   "speed": null,
+   "stats": {
+    "collisions": 0,
+    "multicast": 0,
+    "rx_bytes": 0,
+    "rx_compressed": 0,
+    "rx_crc_errors": 0,
+    "rx_dropped": 0,
+    "rx_errors": 0,
+    "rx_fifo_errors": 0,
+    "rx_frame_errors": 0,
+    "rx_length_errors": 0,
+    "rx_missed_errors": 0,
+    "rx_nohandler": 0,
+    "rx_over_errors": 0,
+    "rx_packets": 0,
+    "tx_aborted_errors": 0,
+    "tx_bytes": 0,
+    "tx_carrier_errors": 0,
+    "tx_compressed": 0,
+    "tx_dropped": 0,
+    "tx_errors": 0,
+    "tx_fifo_errors": 0,
+    "tx_heartbeat_errors": 0,
+    "tx_packets": 0,
+    "tx_window_errors": 0
+   }
+  },
+  "dummy": {
+   "address": "32:ee:fd:69:59:2e",
+   "carrier": 1,
+   "flags": 899,
+   "mtu": 1500,
+   "operstate": "unknown",
+   "speed": null,
+   "stats": {
+    "collisions": 0,
+    "multicast": 0,
+    "rx_bytes": 0,
+    "rx_compressed": 0,
+    "rx_crc_errors": 0,
+    "rx_dropped": 0,
+    "rx_errors": 0,
+    "rx_fifo_errors": 0,
+    "rx_frame_errors": 0,
+    "rx_length_errors": 0,
+    "rx_missed_errors": 0,
+    "rx_nohandler": 0,
+    "rx_over_errors": 0,
+    "rx_packets": 0,
+    "tx_aborted_errors": 0,
+    "tx_bytes": 54,
+    "tx_carrier_errors": 0,
+    "tx_compressed": 0,
+    "tx_dropped": 0,
+    "tx_errors": 0,
+    "tx_fifo_errors": 0,
+    "tx_heartbeat_errors": 0,
+    "tx_packets": 1,
+    "tx_window_errors": 0
+   }
+  },
+  "eth0": {
+   "address": "0a:f6:9c:28:64:c1",
+   "carrier": 1,
+   "flags": 4099,
+   "mtu": 1500,
+   "operstate": "up",
+   "speed": 10000,
+   "stats": {
+    "collisions": 0,
+    "multicast": 0,
+    "rx_bytes": 85499,
+    "rx_compressed": 0,
+    "rx_crc_errors": 0,
+    "rx_dropped": 0,
+    "rx_errors": 0,
+    "rx_fifo_errors": 0,
+    "rx_frame_errors": 0,
+    "rx_length_errors": 0,
+    "rx_missed_errors": 0,
+    "rx_nohandler": 0,
+    "rx_over_errors": 0,
+    "rx_packets": 566,
+    "tx_aborted_errors": 0,
+    "tx_bytes": 21251,
+    "tx_carrier_errors": 0,
+    "tx_compressed": 0,
+    "tx_dropped": 0,
+    "tx_errors": 0,
+    "tx_fifo_errors": 0,
+    "tx_heartbeat_errors": 0,
+    "tx_packets": 96,
+    "tx_window_errors": 0
+   }
+  },
+  "eth1": {
+   "address": "aa:c1:ab:33:87:80",
+   "carrier": 1,
+   "flags": 4483,
+   "mtu": 9122,
+   "operstate": "up",
+   "speed": 10000,
+   "stats": {
+    "collisions": 0,
+    "multicast": 0,
+    "rx_bytes": 19174,
+    "rx_compressed": 0,
+    "rx_crc_errors": 0,
+    "rx_dropped": 0,
+    "rx_errors": 0,
+    "rx_fifo_errors": 0,
+    "rx_frame_errors": 0,
+    "rx_length_errors": 0,
+    "rx_missed_errors": 0,
+    "rx_nohandler": 0,
+    "rx_over_errors": 0,
+    "rx_packets": 206,
+    "tx_aborted_errors": 0,
+    "tx_bytes": 39352,
+    "tx_carrier_errors": 0,
+    "tx_compressed": 0,
+    "tx_dropped": 0,
+    "tx_errors": 0,
+    "tx_fifo_errors": 0,
+    "tx_heartbeat_errors": 0,
+    "tx_packets": 279,
+    "tx_window_errors": 0
+   }
+  },
+  "eth2": {
+   "address": "aa:c1:ab:ba:b5:cf",
+   "carrier": 1,
+   "flags": 4483,
+   "mtu": 9122,
+   "operstate": "up",
+   "speed": 10000,
+   "stats": {
+    "collisions": 0,
+    "multicast": 0,
+    "rx_bytes": 59689,
+    "rx_compressed": 0,
+    "rx_crc_errors": 0,
+    "rx_dropped": 0,
+    "rx_errors": 0,
+    "rx_fifo_errors": 0,
+    "rx_frame_errors": 0,
+    "rx_length_errors": 0,
+    "rx_missed_errors": 0,
+    "rx_nohandler": 0,
+    "rx_over_errors": 0,
+    "rx_packets": 551,
+    "tx_aborted_errors": 0,
+    "tx_bytes": 57392,
+    "tx_carrier_errors": 0,
+    "tx_compressed": 0,
+    "tx_dropped": 0,
+    "tx_errors": 0,
+    "tx_fifo_errors": 0,
+    "tx_heartbeat_errors": 0,
+    "tx_packets": 515,
+    "tx_window_errors": 0
+   }
+  }
+ },
+ "ports": {
+  "appl": {
+   "Ethernet0": {
+    "admin_status": "up",
+    "alias": "fortyGigE0/0",
+    "description": "client1",
+    "flap_count": "3",
+    "index": "0",
+    "lanes": "25,26,27,28",
+    "last_down_time": "Thu Nov 19 13:07:00 2026",
+    "last_up_time": "Thu Nov 19 13:07:00 2026",
+    "mtu": "9100",
+    "oper_status": "up",
+    "speed": "100000",
+    "subport": "0"
+   },
+   "Ethernet4": {
+    "admin_status": "up",
+    "alias": "fortyGigE0/4",
+    "description": "sonic2",
+    "flap_count": "3",
+    "index": "1",
+    "lanes": "29,30,31,32",
+    "last_down_time": "Thu Nov 19 13:07:00 2026",
+    "last_up_time": "Thu Nov 19 13:07:00 2026",
+    "mtu": "9100",
+    "oper_status": "up",
+    "speed": "100000",
+    "subport": "0"
+   },
+   "Ethernet8": {
+    "admin_status": "down",
+    "alias": "fortyGigE0/8",
+    "flap_count": "0",
+    "index": "2",
+    "lanes": "33,34,35,36",
+    "mtu": "9100",
+    "oper_status": "down",
+    "speed": "100000",
+    "subport": "0"
+   }
+  },
+  "config": {
+   "Ethernet0": {
+    "admin_status": "up",
+    "alias": "fortyGigE0/0",
+    "description": "client1",
+    "index": "0",
+    "lanes": "25,26,27,28",
+    "mtu": "9100",
+    "speed": "100000",
+    "subport": "0"
+   },
+   "Ethernet4": {
+    "admin_status": "up",
+    "alias": "fortyGigE0/4",
+    "description": "sonic2",
+    "index": "1",
+    "lanes": "29,30,31,32",
+    "mtu": "9100",
+    "speed": "100000",
+    "subport": "0"
+   },
+   "Ethernet8": {
+    "alias": "fortyGigE0/8",
+    "index": "2",
+    "lanes": "33,34,35,36",
+    "speed": "100000",
+    "subport": "0"
+   }
+  },
+  "lanemap": {
+   "25,26,27,28": "eth1",
+   "29,30,31,32": "eth2"
+  },
+  "state": {
+   "Ethernet0": {
+    "admin_status": "up",
+    "fec": "N/A",
+    "host_tx_ready": "false",
+    "mtu": "9100",
+    "netdev_oper_status": "up",
+    "speed": "100000",
+    "state": "ok",
+    "supported_speeds": ""
+   },
+   "Ethernet4": {
+    "admin_status": "up",
+    "fec": "N/A",
+    "host_tx_ready": "false",
+    "mtu": "9100",
+    "netdev_oper_status": "up",
+    "speed": "100000",
+    "state": "ok",
+    "supported_speeds": ""
+   },
+   "Ethernet8": {
+    "admin_status": "down",
+    "host_tx_ready": "false",
+    "mtu": "9100",
+    "netdev_oper_status": "down",
+    "state": "ok",
+    "supported_speeds": ""
+   }
+  }
+ },
+ "redis": {
+  "active_defrag_hits": 0,
+  "active_defrag_key_hits": 0,
+  "active_defrag_key_misses": 0,
+  "active_defrag_misses": 0,
+  "active_defrag_running": 0,
+  "allocator_active": 7790592,
+  "allocator_allocated": 7098664,
+  "allocator_frag_bytes": 691928,
+  "allocator_frag_ratio": 1.1,
+  "allocator_resident": 13066240,
+  "allocator_rss_bytes": 5275648,
+  "allocator_rss_ratio": 1.68,
+  "aof_current_rewrite_time_sec": -1,
+  "aof_enabled": 0,
+  "aof_last_bgrewrite_status": "ok",
+  "aof_last_cow_size": 0,
+  "aof_last_rewrite_time_sec": -1,
+  "aof_last_write_status": "ok",
+  "aof_rewrite_in_progress": 0,
+  "aof_rewrite_scheduled": 0,
+  "aof_rewrites": 0,
+  "aof_rewrites_consecutive_failures": 0,
+  "arch_bits": 64,
+  "async_loading": 0,
+  "atomicvar_api": "c11-builtin",
+  "blocked_clients": 0,
+  "client_recent_max_input_buffer": 20480,
+  "client_recent_max_output_buffer": 0,
+  "clients_in_timeout_table": 0,
+  "cluster_connections": 0,
+  "cluster_enabled": 0,
+  "config_file": "/etc/redis/redis.conf",
+  "configured_hz": 10,
+  "connected_clients": 1485,
+  "connected_slaves": 0,
+  "current_active_defrag_time": 0,
+  "current_cow_peak": 0,
+  "current_cow_size": 0,
+  "current_cow_size_age": 0,
+  "current_eviction_exceeded_time": 0,
+  "current_fork_perc": 0.0,
+  "current_save_keys_processed": 0,
+  "current_save_keys_total": 0,
+  "db0": {
+   "avg_ttl": 0,
+   "expires": 0,
+   "keys": 193
+  },
+  "db1": {
+   "avg_ttl": 0,
+   "expires": 0,
+   "keys": 1496
+  },
+  "db2": {
+   "avg_ttl": 0,
+   "expires": 0,
+   "keys": 26
+  },
+  "db4": {
+   "avg_ttl": 0,
+   "expires": 0,
+   "keys": 325
+  },
+  "db5": {
+   "avg_ttl": 0,
+   "expires": 0,
+   "keys": 26
+  },
+  "db6": {
+   "avg_ttl": 0,
+   "expires": 0,
+   "keys": 144
+  },
+  "dump_payload_sanitizations": 0,
+  "errorstat_ERR": "count=152",
+  "evicted_clients": 0,
+  "evicted_keys": 0,
+  "executable": "/usr/bin/redis-server",
+  "expire_cycle_cpu_milliseconds": 84,
+  "expired_keys": 0,
+  "expired_stale_perc": 0.0,
+  "expired_time_cap_reached_count": 0,
+  "gcc_version": "12.2.0",
+  "hz": 10,
+  "instantaneous_input_kbps": 1.12,
+  "instantaneous_input_repl_kbps": 0.0,
+  "instantaneous_ops_per_sec": 23,
+  "instantaneous_output_kbps": 0.28,
+  "instantaneous_output_repl_kbps": 0.0,
+  "io_threaded_reads_processed": 0,
+  "io_threaded_writes_processed": 0,
+  "io_threads_active": 0,
+  "keyspace_hits": 95605,
+  "keyspace_misses": 103894,
+  "latest_fork_usec": 0,
+  "lazyfree_pending_objects": 0,
+  "lazyfreed_objects": 0,
+  "loading": 0,
+  "lru_clock": 16711328,
+  "master_failover_state": "no-failover",
+  "master_repl_offset": 0,
+  "master_replid": "87ded5eb2a18342f44cb98f0d84ef0675a59d2fd",
+  "master_replid2": 0,
+  "maxclients": 10000,
+  "maxmemory": 0,
+  "maxmemory_human": "0B",
+  "maxmemory_policy": "noeviction",
+  "mem_allocator": "jemalloc-5.3.0",
+  "mem_aof_buffer": 0,
+  "mem_clients_normal": 2823816,
+  "mem_clients_slaves": 0,
+  "mem_cluster_links": 0,
+  "mem_fragmentation_bytes": 16806112,
+  "mem_fragmentation_ratio": 3.69,
+  "mem_not_counted_for_evict": 0,
+  "mem_replication_backlog": 0,
+  "mem_total_replication_buffers": 0,
+  "migrate_cached_sockets": 0,
+  "module_fork_in_progress": 0,
+  "module_fork_last_cow_size": 0,
+  "monotonic_clock": "POSIX clock_gettime",
+  "multiplexing_api": "epoll",
+  "number_of_cached_scripts": 22,
+  "number_of_functions": 0,
+  "number_of_libraries": 0,
+  "os": "Linux 7.2.15-1-omarchy x86_64",
+  "process_id": 123,
+  "process_supervised": "no",
+  "pubsub_channels": 85,
+  "pubsub_patterns": 144,
+  "pubsubshard_channels": 0,
+  "rdb_bgsave_in_progress": 0,
+  "rdb_changes_since_last_save": 34958,
+  "rdb_current_bgsave_time_sec": -1,
+  "rdb_last_bgsave_status": "ok",
+  "rdb_last_bgsave_time_sec": -1,
+  "rdb_last_cow_size": 0,
+  "rdb_last_load_keys_expired": 0,
+  "rdb_last_load_keys_loaded": 0,
+  "rdb_last_save_time": 1795093615,
+  "rdb_saves": 0,
+  "redis_build_id": "ae4d7c971a948f0",
+  "redis_git_dirty": 0,
+  "redis_git_sha1": 0,
+  "redis_mode": "standalone",
+  "redis_version": "7.0.15",
+  "rejected_connections": 0,
+  "repl_backlog_active": 0,
+  "repl_backlog_first_byte_offset": 0,
+  "repl_backlog_histlen": 0,
+  "repl_backlog_size": 1048576,
+  "reply_buffer_expands": 37,
+  "reply_buffer_shrinks": 2192,
+  "role": "master",
+  "rss_overhead_bytes": 9977856,
+  "rss_overhead_ratio": 1.76,
+  "run_id": "0264841f73ba3ad20ee7a84969f21f1cdfcabaeb",
+  "second_repl_offset": -1,
+  "server_time_usec": 1795096224824979,
+  "slave_expires_tracked_keys": 0,
+  "sync_full": 0,
+  "sync_partial_err": 0,
+  "sync_partial_ok": 0,
+  "tcp_port": 6379,
+  "total_active_defrag_time": 0,
+  "total_commands_processed": 236651,
+  "total_connections_received": 7241,
+  "total_error_replies": 152,
+  "total_eviction_exceeded_time": 0,
+  "total_forks": 0,
+  "total_net_input_bytes": 13276846,
+  "total_net_output_bytes": 16911212,
+  "total_net_repl_input_bytes": 0,
+  "total_net_repl_output_bytes": 0,
+  "total_reads_processed": 226599,
+  "total_system_memory": 32778407936,
+  "total_system_memory_human": "30.53G",
+  "total_writes_processed": 223463,
+  "tracking_clients": 0,
+  "tracking_total_items": 0,
+  "tracking_total_keys": 0,
+  "tracking_total_prefixes": 0,
+  "unexpected_error_replies": 0,
+  "uptime_in_days": 0,
+  "uptime_in_seconds": 2609,
+  "used_cpu_sys": 6.011906,
+  "used_cpu_sys_children": 0.0,
+  "used_cpu_sys_main_thread": 5.999742,
+  "used_cpu_user": 5.288803,
+  "used_cpu_user_children": 0.0,
+  "used_cpu_user_main_thread": 5.278936,
+  "used_memory": 6770200,
+  "used_memory_dataset": 2829616,
+  "used_memory_dataset_perc": "48.32%",
+  "used_memory_functions": 200,
+  "used_memory_human": "6.46M",
+  "used_memory_lua": 146432,
+  "used_memory_lua_human": "143.00K",
+  "used_memory_overhead": 3940584,
+  "used_memory_peak": 39439632,
+  "used_memory_peak_human": "37.61M",
+  "used_memory_peak_perc": "17.17%",
+  "used_memory_rss": 23044096,
+  "used_memory_rss_human": "21.98M",
+  "used_memory_scripts": 89384,
+  "used_memory_scripts_eval": 89184,
+  "used_memory_scripts_human": "87.29K",
+  "used_memory_startup": 913896,
+  "used_memory_vm_eval": 146432,
+  "used_memory_vm_functions": 33792,
+  "used_memory_vm_total": 180224,
+  "used_memory_vm_total_human": "176.00K"
+ },
+ "routes": {
+  "ipv4": {
+   "routes": {
+    "default": {
+     "0.0.0.0/0": [
+      {
+       "distance": 0,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": false,
+         "fib": true,
+         "interface": "eth0",
+         "ip": "172.20.30.1"
+        }
+       ],
+       "offloaded": true,
+       "protocol": "kernel",
+       "selected": true,
+       "uptime": "00:43:23"
+      }
+     ],
+     "10.0.12.0/30": [
+      {
+       "distance": 0,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": true,
+         "fib": true,
+         "interface": "Ethernet4",
+         "ip": null
+        }
+       ],
+       "offloaded": true,
+       "protocol": "connected",
+       "selected": true,
+       "uptime": "00:43:23"
+      }
+     ],
+     "10.255.0.1/32": [
+      {
+       "distance": 0,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": true,
+         "fib": true,
+         "interface": "Loopback0",
+         "ip": null
+        }
+       ],
+       "offloaded": true,
+       "protocol": "connected",
+       "selected": true,
+       "uptime": "00:43:23"
+      }
+     ],
+     "10.255.0.2/32": [
+      {
+       "distance": 20,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": false,
+         "fib": true,
+         "interface": "Ethernet4",
+         "ip": "10.0.12.2"
+        }
+       ],
+       "offloaded": true,
+       "protocol": "bgp",
+       "selected": true,
+       "uptime": "00:43:16"
+      }
+     ],
+     "172.20.30.0/24": [
+      {
+       "distance": 0,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": true,
+         "fib": true,
+         "interface": "eth0",
+         "ip": null
+        }
+       ],
+       "offloaded": true,
+       "protocol": "connected",
+       "selected": true,
+       "uptime": "00:43:23"
+      }
+     ],
+     "192.168.1.0/24": [
+      {
+       "distance": 0,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": true,
+         "fib": true,
+         "interface": "Ethernet0",
+         "ip": null
+        }
+       ],
+       "offloaded": true,
+       "protocol": "connected",
+       "selected": true,
+       "uptime": "00:43:23"
+      }
+     ],
+     "192.168.2.0/24": [
+      {
+       "distance": 20,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": false,
+         "fib": true,
+         "interface": "Ethernet4",
+         "ip": "10.0.12.2"
+        }
+       ],
+       "offloaded": true,
+       "protocol": "bgp",
+       "selected": true,
+       "uptime": "00:43:16"
+      }
+     ]
+    }
+   },
+   "summary": {
+    "default": {
+     "routes": [
+      {
+       "fib": 1,
+       "fibOffLoaded": 1,
+       "fibTrapped": 0,
+       "rib": 1,
+       "type": "kernel"
+      },
+      {
+       "fib": 4,
+       "fibOffLoaded": 4,
+       "fibTrapped": 0,
+       "rib": 4,
+       "type": "connected"
+      },
+      {
+       "fib": 2,
+       "fibOffLoaded": 2,
+       "fibTrapped": 0,
+       "rib": 2,
+       "type": "ebgp"
+      },
+      {
+       "fib": 0,
+       "fibOffLoaded": 0,
+       "fibTrapped": 0,
+       "rib": 0,
+       "type": "ibgp"
+      }
+     ],
+     "routesTotal": 7,
+     "routesTotalFib": 7
+    }
+   },
+   "truncated": false
+  },
+  "ipv6": {
+   "routes": {
+    "default": {
+     "fe80::/64": [
+      {
+       "distance": 0,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": true,
+         "fib": true,
+         "interface": "Ethernet4",
+         "ip": null
+        }
+       ],
+       "offloaded": true,
+       "protocol": "connected",
+       "selected": false,
+       "uptime": "00:43:22"
+      },
+      {
+       "distance": 0,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": true,
+         "fib": true,
+         "interface": "Bridge",
+         "ip": null
+        }
+       ],
+       "offloaded": true,
+       "protocol": "connected",
+       "selected": false,
+       "uptime": "00:43:22"
+      },
+      {
+       "distance": 0,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": true,
+         "fib": true,
+         "interface": "Loopback0",
+         "ip": null
+        }
+       ],
+       "offloaded": true,
+       "protocol": "connected",
+       "selected": false,
+       "uptime": "00:43:23"
+      },
+      {
+       "distance": 0,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": true,
+         "fib": true,
+         "interface": "dummy",
+         "ip": null
+        }
+       ],
+       "offloaded": true,
+       "protocol": "connected",
+       "selected": false,
+       "uptime": "00:43:23"
+      },
+      {
+       "distance": 0,
+       "installed": true,
+       "metric": 0,
+       "nexthops": [
+        {
+         "active": true,
+         "connected": true,
+         "fib": true,
+         "interface": "Ethernet0",
+         "ip": null
+        }
+       ],
+       "offloaded": true,
+       "protocol": "connected",
+       "selected": true,
+       "uptime": "00:43:23"
+      }
+     ]
+    }
+   },
+   "summary": {
+    "default": {
+     "routes": [
+      {
+       "fib": 5,
+       "fibOffLoaded": 5,
+       "fibTrapped": 0,
+       "rib": 5,
+       "type": "connected"
+      }
+     ],
+     "routesTotal": 5,
+     "routesTotalFib": 5
+    }
+   },
+   "truncated": false
+  }
+ },
+ "services": [
+  {
+   "detail": "Not started",
+   "name": "arp_update",
+   "state": "STOPPED"
+  },
+  {
+   "detail": "pid 725, uptime 0:43:22",
+   "name": "bgpcfgd",
+   "pid": 725,
+   "proc": {
+    "cpu_seconds": 0.36,
+    "fds": 70,
+    "processes": 1,
+    "rss_bytes": 37904384,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2602
+  },
+  {
+   "detail": "pid 707, uptime 0:43:22",
+   "name": "bgpd",
+   "pid": 707,
+   "proc": {
+    "cpu_seconds": 0.31,
+    "fds": 31,
+    "processes": 1,
+    "rss_bytes": 43327488,
+    "threads": 4
+   },
+   "state": "RUNNING",
+   "uptime_s": 2602
+  },
+  {
+   "detail": "pid 726, uptime 0:43:22",
+   "name": "bgpmon",
+   "pid": 726,
+   "proc": {
+    "cpu_seconds": 0.13,
+    "fds": 6,
+    "processes": 1,
+    "rss_bytes": 24518656,
+    "threads": 1
+   },
+   "state": "RUNNING",
+   "uptime_s": 2602
+  },
+  {
+   "detail": "pid 428, uptime 0:43:24",
+   "name": "buffermgrd",
+   "pid": 428,
+   "proc": {
+    "cpu_seconds": 0.2,
+    "fds": 47,
+    "processes": 1,
+    "rss_bytes": 10063872,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "pid 411, uptime 0:43:24",
+   "name": "coppmgrd",
+   "pid": 411,
+   "proc": {
+    "cpu_seconds": 0.18,
+    "fds": 34,
+    "processes": 1,
+    "rss_bytes": 9793536,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "Nov 19 01:08 PM",
+   "name": "dependent-startup",
+   "state": "EXITED"
+  },
+  {
+   "detail": "pid 419, uptime 0:43:24",
+   "name": "fabricmgrd",
+   "pid": 419,
+   "proc": {
+    "cpu_seconds": 0.17,
+    "fds": 23,
+    "processes": 1,
+    "rss_bytes": 9465856,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "pid 465, uptime 0:43:24",
+   "name": "fdbsyncd",
+   "pid": 465,
+   "proc": {
+    "cpu_seconds": 0.1,
+    "fds": 32,
+    "processes": 1,
+    "rss_bytes": 9662464,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "pid 727, uptime 0:43:22",
+   "name": "fpmsyncd",
+   "pid": 727,
+   "proc": {
+    "cpu_seconds": 0.08,
+    "fds": 34,
+    "processes": 1,
+    "rss_bytes": 23080960,
+    "threads": 4
+   },
+   "state": "RUNNING",
+   "uptime_s": 2602
+  },
+  {
+   "detail": "Not started",
+   "name": "gbsyncd",
+   "state": "STOPPED"
+  },
+  {
+   "detail": "Not started",
+   "name": "gearsyncd",
+   "state": "STOPPED"
+  },
+  {
+   "detail": "pid 417, uptime 0:43:24",
+   "name": "intfmgrd",
+   "pid": 417,
+   "proc": {
+    "cpu_seconds": 0.19,
+    "fds": 54,
+    "processes": 1,
+    "rss_bytes": 10088448,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "pid 128, uptime 0:43:29",
+   "name": "lldp-syncd",
+   "pid": 128,
+   "proc": {
+    "cpu_seconds": 0.28,
+    "fds": 5,
+    "processes": 1,
+    "rss_bytes": 29814784,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2609
+  },
+  {
+   "detail": "pid 97, uptime 0:43:30",
+   "name": "lldpd",
+   "pid": 97,
+   "proc": {
+    "cpu_seconds": 0.02,
+    "fds": 48,
+    "processes": 2,
+    "rss_bytes": 9830400,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2610
+  },
+  {
+   "detail": "pid 150, uptime 0:43:27",
+   "name": "lldpmgrd",
+   "pid": 150,
+   "proc": {
+    "cpu_seconds": 0.09,
+    "fds": 20,
+    "processes": 1,
+    "rss_bytes": 30318592,
+    "threads": 1
+   },
+   "state": "RUNNING",
+   "uptime_s": 2607
+  },
+  {
+   "detail": "pid 644, uptime 0:43:23",
+   "name": "mgmtd",
+   "pid": 644,
+   "proc": {
+    "cpu_seconds": 0.17,
+    "fds": 20,
+    "processes": 1,
+    "rss_bytes": 23638016,
+    "threads": 1
+   },
+   "state": "RUNNING",
+   "uptime_s": 2603
+  },
+  {
+   "detail": "pid 650, uptime 0:43:23",
+   "name": "natmgrd",
+   "pid": 650,
+   "proc": {
+    "cpu_seconds": 0.18,
+    "fds": 55,
+    "processes": 1,
+    "rss_bytes": 10395648,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2603
+  },
+  {
+   "detail": "pid 800, uptime 0:43:21",
+   "name": "natsyncd",
+   "pid": 800,
+   "proc": {
+    "cpu_seconds": 1.65,
+    "fds": 31,
+    "processes": 1,
+    "rss_bytes": 9449472,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2601
+  },
+  {
+   "detail": "pid 446, uptime 0:43:24",
+   "name": "nbrmgrd",
+   "pid": 446,
+   "proc": {
+    "cpu_seconds": 0.18,
+    "fds": 30,
+    "processes": 1,
+    "rss_bytes": 9768960,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "pid 413, uptime 0:43:24",
+   "name": "neighsyncd",
+   "pid": 413,
+   "proc": {
+    "cpu_seconds": 0.1,
+    "fds": 32,
+    "processes": 1,
+    "rss_bytes": 9793536,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "pid 223, uptime 0:43:26",
+   "name": "orchagent",
+   "pid": 223,
+   "proc": {
+    "cpu_seconds": 5.97,
+    "fds": 692,
+    "processes": 1,
+    "rss_bytes": 103927808,
+    "threads": 13
+   },
+   "state": "RUNNING",
+   "uptime_s": 2606
+  },
+  {
+   "detail": "pid 424, uptime 0:43:24",
+   "name": "portmgrd",
+   "pid": 424,
+   "proc": {
+    "cpu_seconds": 0.2,
+    "fds": 26,
+    "processes": 1,
+    "rss_bytes": 10027008,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "pid 220, uptime 0:43:26",
+   "name": "portsyncd",
+   "pid": 220,
+   "proc": {
+    "cpu_seconds": 0.18,
+    "fds": 24,
+    "processes": 1,
+    "rss_bytes": 9560064,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2606
+  },
+  {
+   "detail": "Not started",
+   "name": "redis-chassis",
+   "state": "STOPPED"
+  },
+  {
+   "detail": "pid 123, uptime 0:43:29",
+   "name": "redis-server",
+   "pid": 123,
+   "proc": {
+    "cpu_seconds": 11.29,
+    "fds": 1494,
+    "processes": 1,
+    "rss_bytes": 23044096,
+    "threads": 5
+   },
+   "state": "RUNNING",
+   "uptime_s": 2609
+  },
+  {
+   "detail": "Nov 19 01:07 PM",
+   "name": "restore_neighbors",
+   "state": "EXITED"
+  },
+  {
+   "detail": "pid 109, uptime 0:43:30",
+   "name": "rsyslogd",
+   "pid": 109,
+   "proc": {
+    "cpu_seconds": 0.51,
+    "fds": 15,
+    "processes": 1,
+    "rss_bytes": 4497408,
+    "threads": 4
+   },
+   "state": "RUNNING",
+   "uptime_s": 2610
+  },
+  {
+   "detail": "pid 648, uptime 0:43:23",
+   "name": "sflowmgrd",
+   "pid": 648,
+   "proc": {
+    "cpu_seconds": 0.18,
+    "fds": 26,
+    "processes": 1,
+    "rss_bytes": 9797632,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2603
+  },
+  {
+   "detail": "pid 1373, uptime 0:42:18",
+   "name": "snmp-subagent",
+   "pid": 1373,
+   "proc": {
+    "cpu_seconds": 6.23,
+    "fds": 173,
+    "processes": 1,
+    "rss_bytes": 40632320,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2538
+  },
+  {
+   "detail": "pid 1360, uptime 0:42:20",
+   "name": "snmpd",
+   "pid": 1360,
+   "proc": {
+    "cpu_seconds": 0.36,
+    "fds": 10,
+    "processes": 1,
+    "rss_bytes": 13238272,
+    "threads": 1
+   },
+   "state": "RUNNING",
+   "uptime_s": 2540
+  },
+  {
+   "detail": "Nov 19 01:08 PM",
+   "name": "start-snmp",
+   "state": "EXITED"
+  },
+  {
+   "detail": "Nov 19 01:07 PM",
+   "name": "start.sh",
+   "state": "EXITED"
+  },
+  {
+   "detail": "pid 706, uptime 0:43:22",
+   "name": "staticd",
+   "pid": 706,
+   "proc": {
+    "cpu_seconds": 0.12,
+    "fds": 15,
+    "processes": 1,
+    "rss_bytes": 20045824,
+    "threads": 1
+   },
+   "state": "RUNNING",
+   "uptime_s": 2602
+  },
+  {
+   "detail": "pid 728, uptime 0:43:22",
+   "name": "staticroutebfd",
+   "pid": 728,
+   "proc": {
+    "cpu_seconds": 0.18,
+    "fds": 18,
+    "processes": 1,
+    "rss_bytes": 25104384,
+    "threads": 1
+   },
+   "state": "RUNNING",
+   "uptime_s": 2602
+  },
+  {
+   "detail": "pid 179, uptime 0:43:27",
+   "name": "syncd",
+   "pid": 179,
+   "proc": {
+    "cpu_seconds": 0.79,
+    "fds": 168,
+    "processes": 1,
+    "rss_bytes": 23515136,
+    "threads": 39
+   },
+   "state": "RUNNING",
+   "uptime_s": 2607
+  },
+  {
+   "detail": "pid 643, uptime 0:43:23",
+   "name": "teammgrd",
+   "pid": 643,
+   "proc": {
+    "cpu_seconds": 0.17,
+    "fds": 36,
+    "processes": 1,
+    "rss_bytes": 9818112,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2603
+  },
+  {
+   "detail": "pid 769, uptime 0:43:21",
+   "name": "teamsyncd",
+   "pid": 769,
+   "proc": {
+    "cpu_seconds": 0.16,
+    "fds": 20,
+    "processes": 1,
+    "rss_bytes": 10555392,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2601
+  },
+  {
+   "detail": "pid 645, uptime 0:43:23",
+   "name": "tlm_teamd",
+   "pid": 645,
+   "proc": {
+    "cpu_seconds": 0.18,
+    "fds": 13,
+    "processes": 1,
+    "rss_bytes": 10133504,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2603
+  },
+  {
+   "detail": "pid 476, uptime 0:43:24",
+   "name": "tunnelmgrd",
+   "pid": 476,
+   "proc": {
+    "cpu_seconds": 0.18,
+    "fds": 29,
+    "processes": 1,
+    "rss_bytes": 9850880,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "pid 415, uptime 0:43:24",
+   "name": "vlanmgrd",
+   "pid": 415,
+   "proc": {
+    "cpu_seconds": 0.18,
+    "fds": 42,
+    "processes": 1,
+    "rss_bytes": 9953280,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "pid 439, uptime 0:43:24",
+   "name": "vrfmgrd",
+   "pid": 439,
+   "proc": {
+    "cpu_seconds": 0.18,
+    "fds": 34,
+    "processes": 1,
+    "rss_bytes": 9842688,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "pid 455, uptime 0:43:24",
+   "name": "vxlanmgrd",
+   "pid": 455,
+   "proc": {
+    "cpu_seconds": 0.18,
+    "fds": 42,
+    "processes": 1,
+    "rss_bytes": 9678848,
+    "threads": 2
+   },
+   "state": "RUNNING",
+   "uptime_s": 2604
+  },
+  {
+   "detail": "Nov 19 01:08 PM",
+   "name": "wait-for-snmp-config",
+   "state": "EXITED"
+  },
+  {
+   "detail": "Nov 19 01:06 PM",
+   "name": "waitfor_lldp_ready",
+   "state": "EXITED"
+  },
+  {
+   "detail": "pid 647, uptime 0:43:23",
+   "name": "zebra",
+   "pid": 647,
+   "proc": {
+    "cpu_seconds": 0.5,
+    "fds": 66,
+    "processes": 1,
+    "rss_bytes": 60469248,
+    "threads": 9
+   },
+   "state": "RUNNING",
+   "uptime_s": 2603
+  },
+  {
+   "detail": "Nov 19 01:07 PM",
+   "name": "zsocket",
+   "state": "EXITED"
+  }
+ ],
+ "syslog": {
+  "counts": {
+   "bgpcfgd\tDEBUG": 51,
+   "bgpcfgd\tINFO": 8,
+   "bgpcfgd\tNOTICE": 2,
+   "bgpmon\tINFO": 1,
+   "buffermgrd\tNOTICE": 82,
+   "coppmgrd\tNOTICE": 19,
+   "fabricmgrd\tNOTICE": 1,
+   "fdbsyncd\tNOTICE": 2,
+   "fpmsyncd\tNOTICE": 6,
+   "intfmgrd\tNOTICE": 3,
+   "lab-bootstrap\tNOTICE": 6,
+   "lldp-syncd\tERR": 260,
+   "lldp-syncd\tINFO": 2,
+   "lldp-syncd\tWARNING": 260,
+   "lldpmgrd\tERR": 2,
+   "natmgrd\tNOTICE": 3,
+   "natsyncd\tNOTICE": 1,
+   "nbrmgrd\tNOTICE": 2,
+   "neighsyncd\tNOTICE": 1,
+   "orchagent\tERR": 143,
+   "orchagent\tNOTICE": 794,
+   "orchagent\tWARNING": 2097,
+   "portmgrd\tNOTICE": 65,
+   "portsyncd\tNOTICE": 198,
+   "restore_neighbor\tINFO": 2,
+   "root\tINFO": 4,
+   "rsyslogd\tERR": 1,
+   "rsyslogd\tINFO": 1,
+   "rsyslogd\tWARNING": 2,
+   "sflowmgrd\tNOTICE": 2,
+   "snmp-subagent\tINFO": 112,
+   "staticroutebfd\tDEBUG": 9,
+   "staticroutebfd\tINFO": 6,
+   "supervisord\tINFO": 693,
+   "syncd\tDEBUG": 1,
+   "syncd\tERR": 272,
+   "syncd\tNOTICE": 745,
+   "syncd\tWARNING": 538,
+   "teammgrd\tNOTICE": 1,
+   "tlm_teamd\tNOTICE": 1,
+   "tunnelmgrd\tNOTICE": 3,
+   "update_chassisdb_config\tINFO": 1,
+   "vlanmgrd\tNOTICE": 2,
+   "vrfmgrd\tNOTICE": 3,
+   "vxlanmgrd\tNOTICE": 2,
+   "wait-for-snmp-config\tERR": 1
+  },
+  "end": 1005765,
+  "events": [
+   {
+    "message": "ok : CONFIG_DB initialis\u00e9e (6s)",
+    "program": "lab-bootstrap",
+    "severity": "NOTICE",
+    "ts": 1795093618.097867
+   },
+   {
+    "message": "ok : ports initialis\u00e9s (PortInitDone) (8s)",
+    "program": "lab-bootstrap",
+    "severity": "NOTICE",
+    "ts": 1795093620.118989
+   },
+   {
+    "message": ":- updatePortOperStatus: Port Ethernet0 oper state set from down to up",
+    "program": "orchagent",
+    "severity": "NOTICE",
+    "ts": 1795093620.679545
+   },
+   {
+    "message": ":- updatePortOperStatus: Port Ethernet0 oper state set from up to down",
+    "program": "orchagent",
+    "severity": "NOTICE",
+    "ts": 1795093620.682897
+   },
+   {
+    "message": ":- updatePortOperStatus: Port Ethernet4 oper state set from down to up",
+    "program": "orchagent",
+    "severity": "NOTICE",
+    "ts": 1795093620.683778
+   },
+   {
+    "message": ":- updatePortOperStatus: Port Ethernet4 oper state set from up to down",
+    "program": "orchagent",
+    "severity": "NOTICE",
+    "ts": 1795093620.686844
+   },
+   {
+    "message": ":- updatePortOperStatus: Port Ethernet0 oper state set from down to up",
+    "program": "orchagent",
+    "severity": "NOTICE",
+    "ts": 1795093620.688477
+   },
+   {
+    "message": ":- updatePortOperStatus: Port Ethernet4 oper state set from down to up",
+    "program": "orchagent",
+    "severity": "NOTICE",
+    "ts": 1795093620.690558
+   }
+  ],
+  "inode": 661387,
+  "reset": true,
+  "start": 0
+ },
+ "ts": 1795096224.7324958,
+ "uptime": 17396.71
+}

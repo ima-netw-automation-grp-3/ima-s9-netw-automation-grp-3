@@ -1,0 +1,10 @@
+{
+  "default_branch": "main",
+  "description": "CI/CD réseau du lab SONiC avec Ansible, par RESTCONF (créé depuis gitlab/network-config)",
+  "name": "network-config",
+  "namespace_kind": "group",
+  "refs": {
+    "refs/heads/main": "98024eab6626f842b1c57f1c3df27672a1414aa0"
+  },
+  "visibility": "private"
+}

@@ -1,0 +1,9 @@
+{#- PATCH appliqué avant le PUT de sonic-sflow : les sessions existent avant que sFlow passe à up.
+    Sinon sflowmgrd échantillonne d'abord tous les ports, et syncd échoue sur les ports non câblés.
+    Sessions : tous les ports arrêtés (« all »), sauf ceux de « ports », à 1 paquet sur sflow_sample_rate. -#}
+{%- set ns = namespace(sessions=[{"port": "all", "admin_state": "down"}]) -%}
+{%- for p in ports | default([]) -%}
+{%-   set ns.sessions = ns.sessions + [{"port": p.name, "admin_state": "up", "sample_rate": sflow_sample_rate | int}] -%}
+{%- endfor -%}
+{%- set doc = {"SFLOW_SESSION": {"SFLOW_SESSION_LIST": ns.sessions}} if sflow_enabled | bool else {} -%}
+{{ {"sonic-sflow:sonic-sflow": doc} | to_nice_json(indent=2) }}

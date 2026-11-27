@@ -1,0 +1,11 @@
+---
+# Déploiement de la conf des routeurs : documents rendus depuis les host_vars, état courant sauvegardé
+# dans rollback/ (artefact), puis application validée par chaque routeur. Routeur par routeur, arrêt au
+# premier échec. Avec --check --diff : le preview seul, rien n'est appliqué (job preview).
+- name: Déployer la configuration des routeurs SONiC
+  hosts: sonic
+  gather_facts: false
+  serial: 1
+  any_errors_fatal: true
+  roles:
+    - role: sonic_config

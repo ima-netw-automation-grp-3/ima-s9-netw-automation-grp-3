@@ -1,0 +1,10 @@
+{
+  "default_branch": "main",
+  "description": "Infra du lab SONiC en GitOps : topologie containerlab et confs de démarrage (make infra-project)",
+  "name": "lab-infra",
+  "namespace_kind": "group",
+  "refs": {
+    "refs/heads/main": "4af94c9bad2cff905580ea66bb9c10b8d1cb833d"
+  },
+  "visibility": "private"
+}

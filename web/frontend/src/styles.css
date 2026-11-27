@@ -1,0 +1,548 @@
+/* Valeurs du thème (couleurs, rampes, états) : src/theme.ts. Ici, uniquement des règles de mise en forme. */
+
+body {
+  font-size: var(--mantine-font-size-sm);
+}
+
+b,
+strong {
+  font-weight: 600;
+}
+
+/* une seule épaisseur de trait pour toutes les icônes */
+.tabler-icon {
+  stroke-width: 1.5;
+  flex-shrink: 0;
+}
+
+/* compteurs, adresses, débits : chiffres alignés en colonne */
+table,
+.mono,
+.mantine-Code-root {
+  font-variant-numeric: tabular-nums;
+}
+
+.mono {
+  font-family: var(--mantine-font-family-monospace);
+}
+
+.muted {
+  color: var(--app-muted);
+}
+
+.mantine-Code-root {
+  --code-bg: var(--app-code-bg);
+}
+
+/* champs en creux dans les panneaux, comme dans Grafana */
+[data-mantine-color-scheme='dark'] .mantine-Input-input[data-variant='default'] {
+  --input-bg: var(--mantine-color-dark-7);
+}
+
+/* anneau de focus clavier : le bleu des liens, lisible sur toutes les surfaces */
+.mantine-focus-auto:focus-visible {
+  outline-color: var(--app-focus);
+}
+
+/* tableaux : en-têtes discrets, colonnes numériques à droite */
+.mantine-Table-th {
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 500;
+  color: var(--mantine-color-dimmed);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.mantine-Table-th.num,
+.mantine-Table-td.num {
+  text-align: right;
+}
+
+.mantine-Tabs-tab {
+  color: var(--mantine-color-dimmed);
+  transition: color 150ms var(--app-ease), background-color 150ms var(--app-ease);
+}
+
+.mantine-Tabs-tab[data-active] {
+  color: var(--mantine-color-text);
+}
+
+/* sur petit écran, les onglets défilent sur une ligne au lieu de passer à la ligne */
+.tabs-scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs-scroll > .mantine-Tabs-tab {
+  flex-shrink: 0;
+}
+
+/* --- états --------------------------------------------------------------------------------- */
+
+/* marque d'état d'un nœud : la forme porte l'état autant que la couleur */
+.state-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+/* signature : la LED carrée d'un port de switch, pour l'état des ports, liens et sessions */
+.led {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 1.5px;
+  background: var(--led, var(--app-led-off));
+  flex-shrink: 0;
+}
+
+.state-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* --- en-tête et navigation ----------------------------------------------------------------- */
+
+.brand {
+  color: var(--mantine-color-text);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.nav-label {
+  margin: 24px 0 8px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--app-muted);
+}
+
+.nav-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: var(--mantine-radius-sm);
+  color: var(--mantine-color-text);
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 150ms var(--app-ease);
+}
+
+.nav-row + .nav-row {
+  margin-top: 2px;
+}
+
+.nav-row:hover {
+  background: var(--app-hover);
+}
+
+.nav-row[data-active] {
+  background: var(--app-raised);
+  box-shadow: var(--app-highlight);
+  font-weight: 500;
+}
+
+.nav-row:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: -2px;
+}
+
+.nav-icon {
+  display: inline-flex;
+  justify-content: center;
+  width: 16px;
+  color: var(--mantine-color-dimmed);
+}
+
+.nav-meta {
+  margin-left: auto;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--app-muted);
+}
+
+/* --- puces de commande (commandes rapides, cibles du lab) ------------------------------------ */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 8px;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 12px;
+  color: var(--mantine-color-text);
+  background: var(--app-raised);
+  border: 1px solid var(--app-border);
+  border-radius: var(--mantine-radius-xs);
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--app-ease),
+    border-color 150ms var(--app-ease),
+    transform 150ms var(--app-ease);
+}
+
+.chip:hover {
+  background: var(--mantine-color-default-hover);
+  border-color: var(--mantine-color-default-border);
+}
+
+.chip:active {
+  transform: scale(0.98);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 2px;
+}
+
+.chip[data-selected] {
+  border-color: var(--mantine-primary-color-filled);
+  color: var(--mantine-color-anchor);
+}
+
+.chip-meta {
+  color: var(--app-muted);
+}
+
+/* --- cartes de nœuds : paires libellé / valeur alignées ------------------------------------- */
+
+.kv {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 16px;
+  row-gap: 4px;
+  align-items: baseline;
+  margin: 0;
+}
+
+.kv dt {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 12px;
+  color: var(--mantine-color-dimmed);
+}
+
+.kv dd {
+  margin: 0;
+  min-width: 0;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.node-name {
+  color: var(--mantine-color-text);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.node-name:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --- sorties de commandes, diffs, logs : fond profond, rayon emboîté (8 − 20 → 4) ------------- */
+
+.output-block {
+  --code-bg: var(--app-deep);
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre;
+  border: 1px solid var(--app-border);
+  border-radius: var(--mantine-radius-xs);
+}
+
+.diff-view,
+.logs-view {
+  margin: 0;
+  padding: 8px 12px;
+  min-height: 40px;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 12px;
+  line-height: 1.5;
+  background: var(--app-deep);
+  border-radius: var(--mantine-radius-xs);
+}
+
+.diff-view {
+  border: 1px solid var(--app-border);
+}
+
+.diff-view > div,
+.logs-view > div {
+  white-space: pre;
+  padding: 0 4px;
+}
+
+.diff-add {
+  background: color-mix(in srgb, var(--state-ok) 16%, transparent);
+}
+
+.diff-del {
+  background: color-mix(in srgb, var(--state-err) 16%, transparent);
+}
+
+.diff-hunk {
+  color: var(--state-info);
+}
+
+.diff-file {
+  color: var(--mantine-color-dimmed);
+  font-weight: 500;
+}
+
+.log-err {
+  color: var(--state-err);
+}
+
+.log-warn {
+  color: var(--state-warn);
+}
+
+.dimmed {
+  color: var(--mantine-color-dimmed);
+}
+
+.logs-box {
+  background: var(--app-deep);
+  border: 1px solid var(--app-border);
+  border-radius: var(--mantine-radius-sm);
+}
+
+/* --- topologie ------------------------------------------------------------------------------ */
+
+.topo {
+  position: relative;
+  width: 100%;
+}
+
+.topo-svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.topo-tile {
+  position: absolute;
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 12px;
+  background: var(--app-raised);
+  border: 1px solid var(--app-border);
+  border-radius: var(--mantine-radius-sm);
+  box-shadow: var(--app-highlight);
+  cursor: pointer;
+  z-index: 2;
+  transition:
+    background-color 150ms var(--app-ease),
+    border-color 150ms var(--app-ease);
+}
+
+.topo-tile:hover {
+  background: var(--mantine-color-default-hover);
+  border-color: var(--mantine-color-default-border);
+}
+
+.topo-tile:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 2px;
+}
+
+.topo-tile[data-alert] {
+  border-color: var(--tile-color);
+}
+
+/* déplacement d'un équipement à la souris */
+.topo-tile {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.topo-tile[data-dragging] {
+  z-index: 5;
+  box-shadow: var(--mantine-shadow-md);
+}
+
+.topo[data-dragging],
+.topo[data-dragging] * {
+  cursor: grabbing;
+}
+
+.topo[data-dragging] .topo-hit {
+  pointer-events: none;
+}
+
+.topo-label {
+  position: absolute;
+  z-index: 1;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  color: var(--mantine-color-dimmed);
+}
+
+.topo-label .sub {
+  color: var(--app-muted);
+}
+
+/* étiquette posée sur le câble (disposition par étages) : le câble passe dessous */
+.topo-label.boxed {
+  padding: 0 4px;
+  background: var(--app-surface);
+}
+
+/* zone de clic droit d'un câble (menu de capture), plus large que le trait */
+.topo-cable-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 14px;
+  pointer-events: stroke;
+  cursor: context-menu;
+}
+
+.topo[data-dragging] .topo-cable-hit,
+.topo[data-dragging] .topo-led {
+  pointer-events: none;
+}
+
+/* voyant de port : clic droit = capture / coupure du câble ; zone de clic élargie autour du carré */
+.topo-led {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  z-index: 3;
+  box-shadow: 0 0 0 2px var(--app-surface);
+  cursor: context-menu;
+}
+
+.topo-led::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+}
+
+/* zone de survol d'un câble compact, plus large que le trait */
+.topo-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 14px;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+/* session eBGP d'un câble compact */
+.topo-session-dot {
+  position: absolute;
+  z-index: 3;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--dot);
+  box-shadow: 0 0 0 2px var(--app-surface);
+}
+
+.topo-session {
+  position: absolute;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  background: var(--app-surface);
+}
+
+/* --- façade du routeur ---------------------------------------------------------------------- */
+
+.front-panel {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+}
+
+/* --- terminal, éditeur, Grafana ------------------------------------------------------------- */
+
+.terminal-box {
+  padding: 8px;
+  background: var(--app-terminal);
+  border: 1px solid var(--app-border);
+  border-radius: var(--mantine-radius-md);
+  overflow: hidden;
+}
+
+.terminal-page {
+  background: var(--app-terminal);
+}
+
+.code-editor {
+  border: 1px solid var(--app-border);
+  border-radius: var(--mantine-radius-xs);
+  overflow: hidden;
+  font-size: 13px;
+}
+
+/* tableau de bord Grafana intégré (onglet « Métrologie ») */
+.capture-frame {
+  display: block;
+  width: 100%;
+  min-height: 480px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--mantine-radius-md);
+  background: #000;
+}
+
+.capture-frame.capture-wait {
+  display: flex;
+  background: var(--mantine-color-body);
+}
+
+.grafana-frame {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 260px);
+  min-height: 640px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--mantine-radius-md);
+  background: var(--mantine-color-body);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-row,
+  .chip,
+  .topo-tile,
+  .mantine-Tabs-tab {
+    transition: none;
+  }
+}

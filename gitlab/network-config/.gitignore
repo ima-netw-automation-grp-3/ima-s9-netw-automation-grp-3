@@ -1,0 +1,8 @@
+# produits des playbooks (artefacts des jobs)
+build/
+rollback/
+# caches d'Ansible, d'ansible-lint et de pytest
+.ansible/
+.cache/
+__pycache__/
+.pytest_cache/

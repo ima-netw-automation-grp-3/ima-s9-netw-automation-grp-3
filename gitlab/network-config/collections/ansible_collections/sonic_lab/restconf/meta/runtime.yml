@@ -1,0 +1,3 @@
+---
+# Collection locale du projet (chargée par collections_path dans ansible.cfg)
+requires_ansible: ">=2.17.0"

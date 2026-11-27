@@ -1,0 +1,9 @@
+# contexte de build lab/ (docker build -f lab/gitops/Dockerfile lab) : seuls la topologie, les confs
+# de démarrage et l'agent GitOps sont utiles ; le dossier de travail de containerlab appartient à root
+clab-*
+.gitops
+backups
+.runner-status
+sonic
+**/__pycache__
+**/.pytest_cache

@@ -1,0 +1,16 @@
+# Tableaux de bord du lab, lus dans /etc/grafana/dashboards (monitoring/grafana/dashboards).
+# allowUiUpdates : modifiables dans Grafana ; pour garder une modification, exportez le JSON
+# (Partager > Exporter) dans monitoring/grafana/dashboards/.
+apiVersion: 1
+
+providers:
+  - name: sonic-lab
+    orgId: 1
+    folder: ${LAB_NAME}
+    folderUid: sonic-lab
+    type: file
+    disableDeletion: false
+    allowUiUpdates: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/dashboards

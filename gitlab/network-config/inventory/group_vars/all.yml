@@ -1,0 +1,27 @@
+---
+# Réglages communs aux routeurs. Les variables d'environnement viennent du runner du lab (.env).
+ansible_connection: local
+ansible_python_interpreter: "{{ ansible_playbook_python }}"
+
+# RESTCONF des routeurs : HTTP Basic, certificat auto-signé recréé avec chaque routeur
+restconf_url: "https://{{ ansible_host }}/restconf"
+restconf_user: "{{ lookup('ansible.builtin.env', 'RESTCONF_USER', default='admin') }}"
+restconf_password: "{{ lookup('ansible.builtin.env', 'RESTCONF_PASSWORD', default='') }}"
+restconf_validate_certs: "{{ lookup('ansible.builtin.env', 'RESTCONF_VERIFY_TLS', default='0') == '1' }}"
+
+# Ports : valeurs par défaut des entrées de « ports » des host_vars
+port_admin_status: up
+port_mtu: 9100
+
+# sFlow : chaque port de « ports » échantillonne 1 paquet reçu sur sflow_sample_rate (256 est le
+# minimum du modèle YANG sonic-sflow) et le routeur envoie les échantillons au collecteur du lab
+# (Telegraf, tableau Grafana « Flux réseau »). false : sFlow arrêté.
+sflow_enabled: true
+sflow_collector_ip: "{{ lookup('ansible.builtin.env', 'FLOW_COLLECTOR_IP', default='172.20.30.6') }}"
+sflow_collector_port: 6343
+sflow_sample_rate: 256
+sflow_polling_interval: 20
+sflow_agent_interface: Loopback0
+
+# Vérification après déploiement : délai de convergence BGP (s)
+verify_timeout: "{{ lookup('ansible.builtin.env', 'VERIFY_TIMEOUT', default='180') | int }}"

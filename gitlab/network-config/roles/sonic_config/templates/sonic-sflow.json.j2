@@ -1,0 +1,24 @@
+{#- PUT du module sonic-sflow : sFlow actif, un collecteur (Telegraf du lab), les sessions des ports.
+    hsflowd est lancé et arrêté par sflowmgrd selon SFLOW|global ; l'ifIndex rapporté est l'index SONiC
+    du port (EthernetN = N + 1). Agent : l'adresse de Loopback0 (sflow_agent_interface). -#}
+{%- if sflow_enabled | bool -%}
+{%-   set ns = namespace(sessions=[{"port": "all", "admin_state": "down"}]) -%}
+{%-   for p in ports | default([]) -%}
+{%-     set ns.sessions = ns.sessions + [{"port": p.name, "admin_state": "up", "sample_rate": sflow_sample_rate | int}] -%}
+{%-   endfor -%}
+{%-   set glob = {"admin_state": "up", "polling_interval": sflow_polling_interval | int} -%}
+{%-   if loopback | default("") and sflow_agent_interface | default("") -%}
+{%-     set glob = glob | combine({"agent_id": sflow_agent_interface}) -%}
+{%-   endif -%}
+{%-   set doc = {
+        "SFLOW": {"global": glob},
+        "SFLOW_COLLECTOR": {"SFLOW_COLLECTOR_LIST": [{
+          "name": "lab",
+          "collector_ip": sflow_collector_ip,
+          "collector_port": sflow_collector_port | int,
+          "collector_vrf": "default"}]},
+        "SFLOW_SESSION": {"SFLOW_SESSION_LIST": ns.sessions}} -%}
+{%- else -%}
+{%-   set doc = {"SFLOW": {"global": {"admin_state": "down"}}} -%}
+{%- endif -%}
+{{ {"sonic-sflow:sonic-sflow": doc} | to_nice_json(indent=2) }}

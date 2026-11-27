@@ -1,0 +1,28 @@
+---
+# Rollback : remet l'état sauvegardé par deploy (rollback/<routeur>/manifest.json, artefact du job
+# deploy), en PUT, dans l'ordre du déploiement. Un routeur sans sauvegarde n'a pas été touché.
+- name: Remettre l'état d'avant le déploiement
+  hosts: sonic
+  gather_facts: false
+  vars:
+    rollback_manifest: "{{ playbook_dir }}/../rollback/{{ inventory_hostname }}/manifest.json"
+  tasks:
+    - name: Chercher la sauvegarde du routeur
+      ansible.builtin.stat:
+        path: "{{ rollback_manifest }}"
+      register: rollback_saved
+      check_mode: false
+
+    - name: Signaler un routeur sans sauvegarde
+      ansible.builtin.debug:
+        msg: aucune sauvegarde pour ce routeur, le déploiement ne l'a pas touché
+      when: not rollback_saved.stat.exists
+
+    - name: Remettre les ressources sauvegardées (PUT)
+      sonic_lab.restconf.config:
+        url: "{{ restconf_url }}"
+        user: "{{ restconf_user }}"
+        password: "{{ restconf_password }}"
+        validate_certs: "{{ restconf_validate_certs }}"
+        documents: "{{ lookup('ansible.builtin.file', rollback_manifest) | from_json }}"
+      when: rollback_saved.stat.exists

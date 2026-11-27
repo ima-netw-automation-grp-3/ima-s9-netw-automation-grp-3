@@ -1,0 +1,27 @@
+---
+# sonic1 : AS 65001, relié à client1 (Ethernet0) et à sonic2 (Ethernet4).
+# containerlab ethN = port SONiC Ethernet{4×(N-1)} : eth1 = Ethernet0, eth2 = Ethernet4.
+ports:
+  - {name: Ethernet0, description: client1}
+  - {name: Ethernet4, description: sonic2}
+
+interfaces:
+  - {name: Ethernet0, ip: 192.168.1.1/24}
+  - {name: Ethernet4, ip: 10.0.12.1/30}
+
+loopback: 10.255.0.1/32
+
+bgp:
+  asn: 65001
+  router_id: 10.255.0.1
+  neighbors:
+    - {address: 10.0.12.2, remote_as: 65002, description: sonic2}
+  networks:
+    - 10.255.0.1/32
+    - 192.168.1.0/24
+
+# après déploiement : chaque voisin BGP doit être Established, et ces pings passer (depuis le routeur)
+verify:
+  ping:
+    - {destination: 192.168.2.10, source: 192.168.1.1}
+    - {destination: 10.255.0.2, source: 10.255.0.1}

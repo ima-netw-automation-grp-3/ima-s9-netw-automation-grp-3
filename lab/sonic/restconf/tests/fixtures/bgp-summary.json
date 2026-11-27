@@ -1,0 +1,45 @@
+{
+"ipv4Unicast":{
+  "routerId":"10.255.0.1",
+  "as":65001,
+  "vrfId":0,
+  "vrfName":"default",
+  "tableVersion":4,
+  "ribCount":4,
+  "ribMemory":640,
+  "peerCount":1,
+  "peerMemory":30696,
+  "peers":{
+    "10.0.12.2":{
+      "hostname":"sonic2",
+      "softwareVersion":"n/a",
+      "remoteAs":65002,
+      "localAs":65001,
+      "version":4,
+      "msgRcvd":55,
+      "msgSent":55,
+      "tableVersion":4,
+      "outq":0,
+      "inq":0,
+      "peerUptime":"00:50:56",
+      "peerUptimeMsec":3056000,
+      "peerUptimeEstablishedEpoch":1795176947,
+      "pfxRcd":2,
+      "pfxSnt":4,
+      "state":"Established",
+      "peerState":"OK",
+      "connectionsEstablished":1,
+      "connectionsDropped":0,
+      "desc":"sonic2",
+      "idType":"ipv4"
+    }
+  },
+  "failedPeers":0,
+  "displayedPeers":1,
+  "totalPeers":1,
+  "dynamicPeers":0,
+  "bestPath":{
+    "multiPathRelax":"false"
+  }
+}
+}
